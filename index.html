@@ -1,0 +1,2370 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Дочка.ру</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; }
+
+  .dn-header { background:#fff; border-bottom:1px solid #e3e8ed; padding:10px 4%; display:flex; align-items:center; gap:24px; position:sticky; top:0; z-index:5; box-shadow:0 1px 4px rgba(0,0,0,.05); }
+  .dn-logo { display:flex; align-items:center; gap:8px; }
+  .dn-logo-icon { width:34px; height:34px; border-radius:8px; background:#d64b8f; color:#fff; font-size:20px; font-weight:bold; display:flex; align-items:center; justify-content:center; }
+  .dn-logo-text { font-size:22px; font-weight:700; color:#b53a78; }
+  .dn-logo-text b { color:#f5a623; }
+  .dn-nav a { color:#4a5568; text-decoration:none; font-size:15px; margin-right:16px; padding:6px 2px; border-bottom:2px solid transparent; cursor:pointer; }
+  .dn-nav a.active { color:#b53a78; border-bottom-color:#d64b8f; font-weight:600; }
+  .dn-user { margin-left:auto; display:flex; align-items:center; gap:10px; font-size:14px; color:#4a5568; }
+  .dn-avatar { width:36px; height:36px; border-radius:50%; background:linear-gradient(135deg,#d64b8f,#f09bc4); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; }
+  .dn-page { display:none; max-width:1000px; margin:24px auto; padding:0 16px; }
+  .dn-page.active { display:block; }
+  .dn-greeting { font-size:20px; color:#1f2d3d; margin-bottom:16px; }
+  .dn-cols { display:grid; grid-template-columns:1.4fr 1fr; gap:16px; }
+  @media (max-width:760px) { .dn-cols { grid-template-columns:1fr; } }
+  .dn-card { background:#fff; border:1px solid #e3e8ed; border-radius:10px; padding:18px; margin-bottom:16px; }
+  .dn-card h3 { font-size:16px; color:#1f2d3d; margin-bottom:12px; padding-bottom:8px; border-bottom:1px solid #eef2f6; }
+  table.dn-table { width:100%; border-collapse:collapse; font-size:14px; }
+  table.dn-table th { text-align:left; color:#8a97a5; font-weight:600; font-size:12px; text-transform:uppercase; padding:6px 8px; border-bottom:1px solid #eef2f6; }
+  table.dn-table td { padding:8px; border-bottom:1px solid #f2f5f8; color:#3c4856; }
+  .mark { font-weight:700; padding:2px 8px; border-radius:5px; font-size:13px; }
+  .m5 { background:#e3f5e8; color:#1e8a3c; } .m4 { background:#e8f0fe; color:#3a72b5; } .m3 { background:#fff3d6; color:#b07d0a; }
+  .hw { color:#c0392b; font-size:13px; }
+  .dn-notice { font-size:14px; color:#4a5568; line-height:1.6; }
+  .dn-notice li { margin:8px 0 0 18px; }
+  .msg { border-left:3px solid #d64b8f; padding:8px 12px; margin-bottom:10px; background:#fdf5f9; border-radius:0 8px 8px 0; }
+  .msg b { display:block; font-size:13px; color:#1f2d3d; margin-bottom:3px; }
+  .msg span { font-size:13px; color:#5c6b7a; }
+  .msg .time { float:right; font-size:11px; color:#9aa7b4; }
+  .subj-row { display:flex; justify-content:space-between; padding:8px 4px; border-bottom:1px solid #f2f5f8; font-size:14px; }
+  .subj-avg { font-weight:700; color:#b53a78; }
+
+  .ad-countdown { position:fixed; bottom:16px; right:16px; background:#17171b; color:#ffd83d; font-size:13px; padding:8px 14px; border-radius:20px; z-index:90; opacity:0; transition:opacity .4s; }
+  .ad-countdown.show { opacity:1; }
+
+  .overlay { position:fixed; inset:0; background:rgba(20,10,18,.6); display:none; justify-content:center; align-items:center; z-index:100; }
+  .overlay.show { display:flex; }
+  .modal { background:#fff; border-radius:18px; max-width:540px; width:94%; padding:30px; box-shadow:0 24px 70px rgba(0,0,0,.45); animation:pop .3s ease; max-height:92vh; overflow-y:auto; position:relative; }
+  @keyframes pop { from { transform:scale(.85); opacity:0; } to { transform:scale(1); opacity:1; } }
+  .ad-window { background:#4a1f3a; color:#fff; text-align:center; }
+  .ad-close { position:absolute; top:14px; right:16px; background:none; border:none; color:#e8cfe0; font-size:15px; cursor:pointer; text-decoration:underline; }
+  .ad-title { font-size:24px; font-weight:800; margin-bottom:8px; }
+  .ad-text { color:#e8cfe0; font-size:15px; margin-bottom:24px; line-height:1.5; }
+  .btn-vkst { background:#fff; color:#4a1f3a; font-weight:700; font-size:16px; border:none; border-radius:24px; padding:14px 32px; cursor:pointer; }
+  .login-title { font-size:20px; font-weight:800; color:#1e3b2f; margin-bottom:6px; text-align:center; }
+  .login-sub { font-size:13px; color:#8a97a5; margin-bottom:20px; text-align:center; }
+  .field { text-align:left; margin-bottom:14px; }
+  .field label { display:block; font-size:13px; color:#4a5568; margin-bottom:5px; font-weight:600; }
+  .field input, .field select { width:100%; padding:11px 14px; border:1px solid #d5dce4; border-radius:10px; font-size:15px; outline:none; background:#fff; }
+  .login-error { color:#c0392b; font-size:13px; min-height:18px; margin-bottom:8px; text-align:center; }
+  .btn-primary { width:100%; background:#1e3b2f; color:#fff; border:none; border-radius:24px; padding:13px; font-size:15px; font-weight:700; cursor:pointer; }
+  .btn-yellow { background:#f5d100; color:#1e3b2f; border:none; border-radius:24px; padding:13px; font-size:15px; font-weight:700; cursor:pointer; width:100%; }
+
+  .vkst { display:none; min-height:100vh; background:#f7f5f0; }
+  .vkst.show { display:block; }
+  .vkst-header { background:#1e3b2f; color:#fff; padding:12px 4%; display:flex; align-items:center; gap:20px; flex-wrap:wrap; position:sticky; top:0; z-index:5; }
+  .btn-menu { background:#f5d100; color:#1e3b2f; border:none; font-weight:700; font-size:15px; border-radius:20px; padding:9px 22px; cursor:pointer; }
+  .vkst-header .link { color:#cfe0d6; font-size:15px; cursor:pointer; }
+  .vkst-header .link.active { color:#f5d100; font-weight:700; }
+  .cart-btn { margin-left:auto; background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.25); color:#fff; border-radius:20px; padding:8px 18px; font-size:14px; cursor:pointer; }
+  .cart-badge { background:#f5d100; color:#1e3b2f; border-radius:10px; padding:1px 8px; font-weight:800; margin-left:5px; }
+
+  .vkst-banner { background:linear-gradient(135deg,#1e3b2f,#2c5544); color:#fff; text-align:center; padding:54px 16px; }
+  .vkst-banner h1 { font-size:32px; margin-bottom:10px; }
+  .vkst-banner p { color:#cfe0d6; margin-bottom:22px; font-size:16px; }
+  .btn-order { background:#f5d100; color:#1e3b2f; border:none; font-weight:700; border-radius:24px; padding:13px 34px; font-size:16px; cursor:pointer; }
+  .vkst-main { max-width:1040px; margin:0 auto; padding:30px 16px 50px; }
+  .vk-page { display:none; }
+  .vk-page.active { display:block; }
+
+  .menu-tabs { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:24px; }
+  .tab { background:#fff; border:1px solid #ddd8ce; border-radius:20px; padding:9px 20px; font-size:14px; cursor:pointer; color:#3c4856; }
+  .tab.active { background:#1e3b2f; border-color:#1e3b2f; color:#fff; font-weight:600; }
+  .menu-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:16px; }
+  .item { background:#fff; border-radius:14px; border:1px solid #eae5da; overflow:hidden; display:flex; flex-direction:column; }
+  .item .photo { height:140px; display:flex; align-items:center; justify-content:center; font-size:52px; position:relative; overflow:hidden; }
+  .item .body { padding:14px; display:flex; flex-direction:column; gap:5px; flex:1; }
+  .item .name { font-weight:700; font-size:15px; color:#1f2d3d; }
+  .item .desc { font-size:12.5px; color:#8a97a5; flex:1; }
+  .item .row { display:flex; justify-content:space-between; align-items:center; margin-top:6px; }
+  .item .price { font-weight:800; font-size:16px; color:#1e3b2f; }
+  .btn-add { background:#f5d100; border:none; border-radius:16px; padding:6px 16px; font-size:13px; font-weight:700; cursor:pointer; color:#1e3b2f; }
+  .btn-add.in-cart { background:#1e3b2f; color:#fff; }
+  .old-price { text-decoration:line-through; color:#b0b0b0; font-size:13px; margin-right:6px; }
+  .promo-badge { position:absolute; top:10px; left:10px; background:#e8542f; color:#fff; font-size:11px; font-weight:800; padding:3px 10px; border-radius:10px; z-index:2; }
+  .tab-panel { display:none; } .tab-panel.active { display:block; }
+
+  .promo-hero { border-radius:16px; color:#fff; padding:34px 28px; margin-bottom:18px; display:flex; align-items:center; gap:24px; flex-wrap:wrap; }
+  .promo-hero .ph-emoji { font-size:54px; }
+  .promo-hero h3 { font-size:22px; margin-bottom:6px; }
+  .promo-hero p { font-size:14px; opacity:.9; max-width:460px; }
+  .promo-hero .tag { display:inline-block; background:rgba(255,255,255,.2); border-radius:14px; font-size:12px; font-weight:700; padding:4px 14px; margin-bottom:10px; }
+  .promo-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:16px; }
+  .promo-card { border-radius:14px; padding:22px; color:#fff; position:relative; overflow:hidden; min-height:140px; display:flex; flex-direction:column; justify-content:flex-end; }
+  .promo-card .big-e { position:absolute; right:14px; top:10px; font-size:48px; opacity:.85; }
+  .promo-card b { font-size:17px; margin-bottom:4px; display:block; }
+  .promo-card span { font-size:13px; opacity:.92; }
+
+  .rest-card { background:#fff; border:1px solid #eae5da; border-radius:14px; padding:18px; display:flex; gap:16px; align-items:flex-start; margin-bottom:14px; }
+  .rest-emoji { font-size:34px; background:#f2ecdf; border-radius:12px; width:60px; height:60px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .rest-card b { font-size:15px; color:#1f2d3d; display:block; margin-bottom:3px; }
+  .rest-card .addr { font-size:13.5px; color:#4a5568; }
+  .rest-card .meta { font-size:13px; color:#8a97a5; margin-top:6px; }
+  .rest-status { font-size:12.5px; font-weight:700; padding:3px 12px; border-radius:10px; margin-left:8px; }
+  .rs-open { background:#e3f5e8; color:#1e8a3c; }
+  .rs-24 { background:#f5d100; color:#1e3b2f; }
+  .rate { color:#b07d0a; font-weight:700; }
+
+  .order-num { display:inline-block; background:#f5d100; color:#1e3b2f; font-weight:800; border-radius:10px; padding:8px 20px; margin:12px 0 4px; font-size:18px; }
+  .eta { text-align:center; font-size:15px; color:#1f2d3d; margin-bottom:14px; }
+  .eta b { font-size:22px; color:#1e3b2f; }
+  .step { display:flex; align-items:center; gap:10px; padding:7px 0; font-size:14px; color:#9aa7b4; }
+  .step .dot { width:22px; height:22px; border-radius:50%; border:2px solid #d5dce4; display:flex; align-items:center; justify-content:center; font-size:12px; flex-shrink:0; }
+  .step.done { color:#1f2d3d; }
+  .step.done .dot { background:#1e3b2f; border-color:#1e3b2f; color:#fff; }
+  .step.now { color:#1e3b2f; font-weight:700; }
+  .step.now .dot { border-color:#1e3b2f; background:#f5d100; }
+
+  .cart-modal { text-align:left; }
+  .cart-modal h3 { font-size:20px; font-weight:800; color:#1e3b2f; margin-bottom:16px; text-align:center; }
+  .cart-empty { text-align:center; color:#8a97a5; font-size:15px; padding:20px 0; }
+  .cart-line { display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid #eef2f6; }
+  .cart-line .n { flex:1; font-size:14px; font-weight:600; color:#1f2d3d; }
+  .cart-line .s { font-size:12px; color:#8a97a5; display:block; font-weight:400; }
+  .qty { display:flex; align-items:center; gap:8px; }
+  .qty button { width:26px; height:26px; border-radius:50%; border:1px solid #d5dce4; background:#fff; font-size:15px; cursor:pointer; font-weight:700; color:#1e3b2f; }
+  .qty span { min-width:20px; text-align:center; font-weight:700; font-size:14px; }
+  .cart-line .sum { min-width:70px; text-align:right; font-weight:800; font-size:14px; color:#1e3b2f; }
+  .cart-total { display:flex; justify-content:space-between; padding:14px 0 4px; font-size:17px; font-weight:800; color:#1f2d3d; }
+  .cart-note { font-size:12px; color:#8a97a5; margin-bottom:14px; }
+  .radio-block { border:1px solid #e3e8ed; border-radius:12px; padding:14px; margin-bottom:12px; cursor:pointer; }
+  .radio-block.selected { border-color:#1e3b2f; background:#f2f7f4; }
+  .radio-block b { font-size:15px; color:#1f2d3d; }
+  .radio-block span { display:block; font-size:12.5px; color:#8a97a5; margin-top:3px; }
+  .addr-panel { display:none; margin:6px 0 14px; }
+  .addr-panel.show { display:block; }
+  .two-col { display:flex; gap:10px; }
+  .two-col .field { flex:1; }
+
+  .vkst-footer { background:#1e3b2f; color:#9bb5a7; text-align:center; padding:22px; font-size:13px; }
+
+  .v-logo { display:flex; align-items:center; gap:12px; }
+  .v-mark { width:44px; height:44px; border-radius:10px; background:#1e3b2f; position:relative; overflow:hidden; border:1px solid rgba(255,255,255,.25); flex-shrink:0; }
+  .v-mark::before, .v-mark::after { content:''; position:absolute; width:7px; height:34px; background:#f5d100; border-radius:4px; left:16px; top:5px; }
+  .v-mark::before { transform:rotate(18deg); }
+  .v-mark::after  { transform:rotate(-18deg); left:21px; }
+  .v-mark .dot { position:absolute; width:13px; height:13px; border-radius:50%; background:#e8542f; left:7px; top:16px; }
+  .v-name { font-weight:800; font-size:19px; letter-spacing:.4px; white-space:nowrap; }
+  .v-name .yellow { color:#f5d100; }
+
+  .game-bar { background:#1e3b2f; color:#fff; padding:10px 4%; display:flex; align-items:center; gap:14px; flex-wrap:wrap; position:sticky; top:0; z-index:5; border-bottom:3px solid #f5d100; }
+  .game-bar .stat { display:flex; align-items:center; gap:6px; font-size:14px; }
+  .game-bar .stat b { font-weight:800; }
+  .game-bar .cash b { color:#f5d100; }
+  .game-bar .debt b { color:#ff6b4a; }
+  .game-bar .debt.hidden { display:none; }
+  .game-bar .title { font-weight:800; color:#f5d100; font-size:15px; margin-right:auto; }
+  .game-tab { background:none; border:1px solid rgba(255,255,255,.3); color:#fff; border-radius:16px; padding:6px 14px; font-size:13px; cursor:pointer; }
+  .game-tab.active { background:#f5d100; color:#1e3b2f; border-color:#f5d100; font-weight:700; }
+
+  .game-main { max-width:1040px; margin:0 auto; padding:24px 16px 60px; position:relative; }
+  .game-view { display:none; }
+  .game-view.active { display:block; }
+  .game-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:16px; }
+  .recipe-card { background:#fff; border:1px solid #eae5da; border-radius:14px; overflow:hidden; display:flex; flex-direction:column; }
+  .recipe-card.locked { opacity:.7; }
+  .recipe-photo { height:120px; display:flex; align-items:center; justify-content:center; font-size:46px; background:#f0ece3; }
+  .recipe-body { padding:14px; display:flex; flex-direction:column; gap:6px; flex:1; }
+  .recipe-body .n { font-weight:700; font-size:15px; color:#1f2d3d; }
+  .recipe-body .meta { font-size:12.5px; color:#8a97a5; }
+  .recipe-body .row { display:flex; justify-content:space-between; align-items:center; margin-top:auto; gap:8px; }
+  .recipe-body .profit { font-weight:800; color:#1e3b2f; font-size:14px; }
+  .btn-cook { background:#f5d100; border:none; border-radius:16px; padding:7px 16px; font-size:13px; font-weight:700; cursor:pointer; color:#1e3b2f; }
+  .btn-cook:disabled { background:#e3e8ed; color:#a9b2ba; cursor:not-allowed; }
+  .btn-unlock { background:#1e3b2f; border:none; border-radius:16px; padding:7px 16px; font-size:13px; font-weight:700; cursor:pointer; color:#fff; }
+
+  .credit-box { background:#fff; border:1px solid #eae5da; border-radius:14px; padding:22px; max-width:560px; }
+  .credit-box h3 { font-size:20px; color:#1e3b2f; margin-bottom:10px; }
+  .credit-box p { font-size:14px; color:#4a5568; line-height:1.6; margin-bottom:8px; }
+  .credit-box .big { font-size:26px; font-weight:800; color:#e8542f; }
+  .credit-box .actions { display:flex; gap:10px; margin-top:16px; flex-wrap:wrap; }
+  .credit-box .actions button { flex:1; min-width:140px; }
+  .warn { background:#fff3d6; color:#b07d0a; border-radius:10px; padding:10px 14px; font-size:13px; margin-top:12px; }
+  .paid-off { background:#e3f5e8; color:#1e8a3c; border-radius:10px; padding:14px; font-weight:700; text-align:center; }
+
+  .minigame { background:#fff; border:1px solid #eae5da; border-radius:16px; padding:20px; max-width:560px; margin:0 auto 20px; }
+  .minigame h3 { font-size:18px; color:#1e3b2f; margin-bottom:6px; }
+  .minigame p { font-size:13.5px; color:#8a97a5; margin-bottom:16px; }
+
+  .burger-stage { position:relative; height:220px; background:#fbf6ec; border-radius:12px; overflow:hidden; margin-bottom:14px; }
+  .falling-ing { position:absolute; font-size:34px; cursor:pointer; user-select:none; text-align:center; width:44px; }
+  .burger-stack { display:flex; flex-direction:column-reverse; align-items:center; justify-content:flex-end; min-height:70px; margin-bottom:8px; }
+  .burger-stack span { font-size:30px; line-height:1; }
+  .recipe-sequence { font-size:13px; color:#8a97a5; margin-bottom:10px; }
+  .recipe-sequence b { color:#1e3b2f; }
+
+  .fryer-wrap { text-align:center; }
+  .fryer-pot { width:120px; height:120px; margin:0 auto 14px; border-radius:50%; background:radial-gradient(circle at 50% 40%,#ffd86b,#e8a020 60%,#b8741a); display:flex; align-items:center; justify-content:center; font-size:44px; box-shadow:inset 0 6px 18px rgba(0,0,0,.25); transition: transform 0.1s; }
+  .fryer-pot.cooking { animation: shake 0.2s infinite; }
+  @keyframes shake { 0% { transform: translate(1px, 1px) rotate(0deg); } 50% { transform: translate(-1px, -1px) rotate(2deg); } 100% { transform: translate(1px, 1px) rotate(0deg); } }
+  .fryer-timer { height:24px; background:#e3e8ed; border-radius:12px; overflow:hidden; position:relative; margin-bottom:8px; }
+  .fryer-timer .zone { position:absolute; top:0; bottom:0; background:rgba(30,138,60,.4); border-left:2px dashed #1e8a3c; border-right:2px dashed #1e8a3c; }
+  .fryer-timer .fill { position:absolute; left:0; top:0; bottom:0; background:#f5d100; width:0%; }
+  .fryer-hint { font-size:13px; color:#8a97a5; margin-bottom:10px; }
+
+  .drink-wrap { text-align:center; }
+  .drink-glass { width:100px; height:160px; margin:0 auto 16px; border:4px solid #1e3b2f; border-top:none; border-radius:0 0 16px 16px; position:relative; overflow:hidden; background:#f7fafd; }
+  .drink-fill { position:absolute; left:0; right:0; bottom:0; background:linear-gradient(180deg,#8ecae6,#2a4d9b); height:0%; }
+  .drink-target { position:absolute; left:0; right:0; background:rgba(30,138,60,.3); border-top:2px dashed #1e8a3c; border-bottom:2px dashed #1e8a3c; }
+  .drink-foam { position:absolute; left:0; right:0; bottom:0; height:0; background:rgba(255,255,255,0.6); transition:height 0.1s; }
+
+  .leaderboard { background:#fff; border:1px solid #eae5da; border-radius:14px; padding:20px; }
+  .leaderboard h3 { font-size:18px; color:#1e3b2f; margin-bottom:12px; }
+  .lb-row { display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid #f2f5f8; font-size:14px; }
+  .lb-row .place { width:28px; font-weight:800; color:#8a97a5; }
+  .lb-row .place.gold { color:#d4a017; }
+  .lb-row .who { flex:1; font-weight:600; color:#1f2d3d; }
+  .lb-row .score { font-weight:800; color:#1e3b2f; }
+  .lb-row.me { background:#fff8e1; border-radius:8px; padding-left:8px; }
+  .name-form { display:flex; gap:8px; margin-bottom:14px; }
+  .name-form input { flex:1; padding:10px 14px; border:1px solid #d5dce4; border-radius:10px; font-size:14px; }
+  .name-form button { background:#1e3b2f; color:#fff; border:none; border-radius:10px; padding:10px 18px; font-size:14px; font-weight:700; cursor:pointer; }
+
+  .shop-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:16px; }
+  .shop-card { background:#fff; border:1px solid #eae5da; border-radius:14px; overflow:hidden; display:flex; flex-direction:column; padding:16px; gap:6px; }
+  .shop-card.owned { background:#f2f7f4; border-color:#1e8a3c; }
+  .shop-card .ico { font-size:40px; text-align:center; }
+  .shop-card .n { font-weight:700; font-size:15px; color:#1f2d3d; }
+  .shop-card .d { font-size:12.5px; color:#8a97a5; flex:1; }
+  .shop-card .pr { font-weight:800; color:#1e3b2f; font-size:15px; }
+  .shop-card .btn-buy { background:#f5d100; border:none; border-radius:16px; padding:8px 0; font-size:13px; font-weight:700; cursor:pointer; color:#1e3b2f; margin-top:6px; }
+  .shop-card .btn-buy:disabled { background:#e3e8ed; color:#a9b2ba; cursor:not-allowed; }
+  .shop-card .owned-tag { color:#1e8a3c; font-weight:700; font-size:13px; text-align:center; margin-top:6px; }
+
+  .toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px); background:#1e3b2f; color:#fff; padding:12px 24px; border-radius:24px; font-size:14px; font-weight:600; opacity:0; transition:all .3s; z-index:200; pointer-events:none; box-shadow:0 8px 24px rgba(0,0,0,.25); }
+  .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+  .toast.bad { background:#c0392b; }
+  .toast.good { background:#1e8a3c; }
+
+  .goals-panel { background:#fff; border:1px solid #eae5da; border-radius:14px; padding:20px; margin-top:20px; }
+  .goals-panel h3 { font-size:18px; color:#1e3b2f; margin-bottom:10px; }
+  .goal-row { display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid #f2f5f8; font-size:14px; }
+  .goal-row .ico { font-size:22px; }
+  .goal-row .n { flex:1; color:#1f2d3d; font-weight:600; }
+  .goal-row .done { color:#1e8a3c; font-weight:700; }
+  .goal-row .notyet { color:#8a97a5; }
+
+  .reg-modal { text-align:center; }
+  .reg-modal h3 { font-size:22px; color:#1e3b2f; margin-bottom:8px; }
+  .reg-modal p { font-size:14px; color:#8a97a5; margin-bottom:18px; }
+  .reg-modal .field { text-align:left; }
+  .avatar-choice { display:flex; justify-content:center; gap:12px; margin-bottom:16px; }
+  .avatar-choice button { font-size:28px; background:#f2ecdf; border:2px solid transparent; border-radius:12px; width:56px; height:56px; cursor:pointer; }
+  .avatar-choice button.sel { border-color:#1e3b2f; background:#f5d100; }
+
+  .daily-bonus { background:linear-gradient(135deg,#f5d100,#e8a020); color:#1e3b2f; border-radius:12px; padding:14px 18px; margin-bottom:16px; display:flex; align-items:center; gap:12px; font-size:14px; font-weight:600; }
+  .daily-bonus button { margin-left:auto; background:#1e3b2f; color:#fff; border:none; border-radius:16px; padding:8px 16px; font-size:13px; font-weight:700; cursor:pointer; }
+
+  .event-popup { position:fixed; top:80px; left:50%; transform:translateX(-50%) translateY(-20px); background:#fff; border:3px solid #f5d100; border-radius:16px; padding:18px 24px; box-shadow:0 12px 40px rgba(0,0,0,.25); z-index:150; max-width:400px; opacity:0; transition:all .4s; pointer-events:none; }
+  .event-popup.show { opacity:1; transform:translateX(-50%) translateY(0); pointer-events:auto; }
+  .event-popup .t { font-weight:800; color:#1e3b2f; margin-bottom:6px; }
+  .event-popup .d { font-size:13.5px; color:#4a5568; margin-bottom:12px; }
+  .event-popup button { background:#1e3b2f; color:#fff; border:none; border-radius:16px; padding:8px 18px; font-size:13px; font-weight:700; cursor:pointer; }
+
+  .manager-widget { position:fixed; right:18px; bottom:80px; z-index:120; display:flex; flex-direction:column; align-items:flex-end; gap:8px; pointer-events:none; transition:opacity .3s, transform .3s; }
+  .manager-widget.hidden { opacity:0; transform:translateY(20px); pointer-events:none; }
+  .manager-bubble { background:#fff; border:2px solid #1e3b2f; border-radius:14px 14px 0 14px; padding:10px 14px; font-size:13px; color:#1f2d3d; max-width:260px; box-shadow:0 8px 24px rgba(0,0,0,.18); line-height:1.4; opacity:0; transform:translateY(10px); transition:opacity .3s, transform .3s; pointer-events:auto; }
+  .manager-bubble.show { opacity:1; transform:translateY(0); }
+  .manager-figure { pointer-events:auto; cursor:pointer; user-select:none; background:#f5d100; border-radius:50%; width:76px; height:76px; display:flex; flex-direction:column; align-items:center; justify-content:center; box-shadow:0 6px 20px rgba(0,0,0,.25); position:relative; animation:managerBob 3s ease-in-out infinite; }
+  @keyframes managerBob { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-6px); } }
+  .manager-figure .head { font-size:30px; line-height:1; }
+  .manager-figure .arms { font-size:16px; position:absolute; top:26px; left:0; right:0; display:flex; justify-content:space-between; padding:0 6px; }
+  .manager-figure .arms span { display:inline-block; animation:armsShrug 2.4s ease-in-out infinite; }
+  .manager-figure .arms span:last-child { animation-delay:.1s; }
+  @keyframes armsShrug { 0%,100% { transform:rotate(0deg) translateY(0); } 50% { transform:rotate(-25deg) translateY(-3px); } }
+  .manager-figure .badge { position:absolute; bottom:-6px; right:-6px; background:#e8542f; color:#fff; font-size:10px; font-weight:800; border-radius:10px; padding:2px 7px; }
+  .manager-controls { pointer-events:auto; display:flex; gap:6px; margin-top:6px; }
+  .manager-controls button { background:#1e3b2f; color:#fff; border:none; border-radius:12px; padding:6px 12px; font-size:12px; font-weight:700; cursor:pointer; }
+  .manager-controls button.ghost { background:#8a97a5; }
+
+  .casino-wrap { max-width:720px; margin:0 auto; }
+  .casino-head { text-align:center; margin-bottom:18px; }
+  .casino-head h2 { font-size:28px; color:#4a1f3a; margin-bottom:6px; }
+  .casino-head p { font-size:14px; color:#8a97a5; }
+  .casino-balance { display:inline-block; background:#f5d100; color:#4a1f3a; font-weight:800; border-radius:14px; padding:8px 18px; margin-top:10px; font-size:16px; }
+  .casino-tabs { display:flex; justify-content:center; gap:10px; margin:18px 0; }
+  .casino-tab { background:#fff; border:2px solid #4a1f3a; color:#4a1f3a; border-radius:20px; padding:10px 24px; font-size:15px; font-weight:700; cursor:pointer; }
+  .casino-tab.active { background:#4a1f3a; color:#f5d100; }
+  .casino-panel { display:none; }
+  .casino-panel.active { display:block; }
+
+  .wheel-box { text-align:center; padding:20px 0; }
+  .wheel-outer { width:300px; height:300px; margin:0 auto 20px; position:relative; border-radius:50%; box-shadow:0 12px 40px rgba(0,0,0,.3); }
+  .wheel-pointer { position:absolute; top:-12px; left:50%; transform:translateX(-50%); font-size:30px; z-index:3; filter:drop-shadow(0 2px 4px rgba(0,0,0,.4)); }
+  .wheel-svg { width:100%; height:100%; border-radius:50%; transition:transform 4s cubic-bezier(.17,.67,.3,1); }
+  .wheel-center { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:60px; height:60px; border-radius:50%; background:#4a1f3a; color:#f5d100; font-weight:800; font-size:14px; display:flex; align-items:center; justify-content:center; z-index:2; box-shadow:0 0 0 4px #f5d100; }
+  .bet-row { display:flex; align-items:center; justify-content:center; gap:8px; flex-wrap:wrap; margin-bottom:12px; }
+  .bet-row label { font-size:14px; color:#4a5568; font-weight:600; }
+  .bet-row input { width:120px; padding:10px 14px; border:1px solid #d5dce4; border-radius:10px; font-size:15px; text-align:center; outline:none; }
+  .bet-row button { background:#4a1f3a; color:#f5d100; border:none; border-radius:20px; padding:10px 26px; font-size:15px; font-weight:800; cursor:pointer; }
+  .bet-row button:disabled { background:#a9b2ba; color:#fff; cursor:not-allowed; }
+  .casino-hint { font-size:12.5px; color:#8a97a5; margin-top:10px; }
+
+  .slots-box { text-align:center; padding:20px 0; }
+  .slots-reels { display:flex; justify-content:center; gap:12px; margin-bottom:18px; }
+  .slot-reel { width:90px; height:110px; background:#fff; border:3px solid #4a1f3a; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:54px; box-shadow:inset 0 -8px 16px rgba(0,0,0,.08); }
+  .slot-reel.spinning { animation:reelSpin .12s linear infinite; }
+  @keyframes reelSpin { 0% { transform:translateY(-4px); } 50% { transform:translateY(4px); } 100% { transform:translateY(-4px); } }
+  .slots-result { font-size:16px; font-weight:700; min-height:24px; margin-bottom:8px; }
+
+  .casino-history { background:#fff; border:1px solid #eae5da; border-radius:14px; padding:16px; margin-top:20px; max-height:200px; overflow-y:auto; }
+  .casino-history h4 { font-size:15px; color:#4a1f3a; margin-bottom:8px; }
+  .ch-row { display:flex; justify-content:space-between; padding:5px 0; font-size:13px; border-bottom:1px solid #f2f5f8; }
+  .ch-win { color:#1e8a3c; font-weight:700; }
+  .ch-lose { color:#c0392b; font-weight:700; }
+  .ch-empty { color:#8a97a5; font-size:13px; }
+
+  .secret-btn { position:fixed; bottom:12px; left:12px; width:28px; height:28px; border-radius:50%; background:#1e3b2f; color:#f5d100; border:none; font-size:14px; cursor:pointer; z-index:110; opacity:.25; transition:opacity .3s; }
+  .secret-btn:hover { opacity:1; }
+
+  /* НОВЫЙ БОЙ DOOM (Raycasting 3D) */
+  .doom-container { background:#000; border-radius:14px; overflow:hidden; position:relative; width:100%; max-width:800px; margin:0 auto; }
+  .doom-canvas { display:block; width:100%; height:auto; cursor:crosshair; background:#1a0a0a; }
+  .doom-hud { position:absolute; bottom:0; left:0; right:0; background:rgba(20,20,20,0.9); color:#ff0000; font-family:'Courier New',monospace; font-weight:bold; font-size:24px; padding:10px 20px; display:flex; justify-content:space-between; border-top:3px solid #444; text-shadow: 0 0 5px #ff0000; }
+  .doom-weapons { position:absolute; top:10px; right:10px; display:flex; flex-direction:column; gap:5px; }
+  .doom-weapon-btn { background:rgba(0,0,0,0.7); border:2px solid #555; color:#888; padding:5px 10px; font-family:monospace; cursor:pointer; font-size:14px; }
+  .doom-weapon-btn.active { border-color:#f5d100; color:#f5d100; background:rgba(245,209,0,0.2); }
+  .doom-crosshair { position:absolute; top:50%; left:50%; width:20px; height:20px; transform:translate(-50%,-50%); border:2px solid rgba(255,0,0,0.5); border-radius:50%; pointer-events:none; }
+
+  .build-banner { background:linear-gradient(135deg,#e8542f,#f5a623); color:#fff; border-radius:14px; padding:18px; margin-bottom:16px; cursor:pointer; display:flex; align-items:center; gap:14px; }
+  .build-banner .ico { font-size:40px; }
+  .build-banner b { font-size:17px; }
+  .build-banner span { font-size:13px; opacity:.9; }
+  .build-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:16px; }
+  .build-card { background:#fff; border:1px solid #eae5da; border-radius:14px; padding:16px; display:flex; flex-direction:column; gap:6px; }
+  .build-card.done { background:#f2f7f4; border-color:#1e8a3c; }
+  .build-card .ico { font-size:40px; text-align:center; }
+  .build-card .n { font-weight:700; font-size:15px; color:#1f2d3d; }
+  .build-card .d { font-size:12.5px; color:#8a97a5; flex:1; }
+  .build-card .pr { font-weight:800; color:#1e3b2f; font-size:15px; }
+  .build-card .btn-build { background:#e8542f; color:#fff; border:none; border-radius:16px; padding:8px 0; font-size:13px; font-weight:700; cursor:pointer; margin-top:6px; }
+  .build-card .btn-build:disabled { background:#e3e8ed; color:#a9b2ba; cursor:not-allowed; }
+  .build-progress { background:#e3e8ed; border-radius:8px; height:12px; overflow:hidden; margin-top:10px; }
+  .build-progress > div { height:100%; background:linear-gradient(90deg,#e8542f,#f5d100); transition:width .3s; }
+</style>
+</head>
+<body>
+
+<!-- ============ ДОЧКА.РУ ============ -->
+<div id="dnevnik">
+  <header class="dn-header">
+    <div class="dn-logo">
+      <div class="dn-logo-icon">Д</div>
+      <div class="dn-logo-text">Дочка<b>.ру</b></div>
+    </div>
+    <nav class="dn-nav">
+      <a class="active" onclick="dnShow('home', this)">Главная</a>
+      <a onclick="dnShow('diary', this)">Дневник</a>
+      <a onclick="dnShow('schedule', this)">Расписание</a>
+      <a onclick="dnShow('grades', this)">Оценки</a>
+      <a onclick="dnShow('messages', this)">Сообщения</a>
+    </nav>
+    <div class="dn-user">
+      <span>Иванов Иван, 9 «Б»</span>
+      <div class="dn-avatar">И</div>
+    </div>
+  </header>
+
+  <div class="dn-page active" id="dnp-home">
+    <div class="dn-greeting">Привет, Иван! 👋 Вторник, 10 ноября</div>
+    <div class="dn-cols">
+      <div>
+        <div class="dn-card">
+          <h3>📅 Сегодня</h3>
+          <table class="dn-table">
+            <tr><th>Время</th><th>Урок</th><th>Каб.</th><th>Домашнее задание</th></tr>
+            <tr><td>08:30–09:15</td><td>Алгебра</td><td>204</td><td class="hw">№ 412, 415</td></tr>
+            <tr><td>09:25–10:10</td><td>Русский язык</td><td>112</td><td class="hw">Упр. 287</td></tr>
+            <tr><td>10:25–11:10</td><td>Физика</td><td>301</td><td class="hw">Повторить § 14</td></tr>
+            <tr><td>11:25–12:10</td><td>Английский</td><td>118</td><td class="hw">Слова Unit 4</td></tr>
+            <tr><td>12:20–13:05</td><td>История</td><td>205</td><td class="hw">Параграф 19</td></tr>
+            <tr><td>13:20–14:05</td><td>Физкультура</td><td>Спортзал</td><td>—</td></tr>
+            <tr><td>14:15–15:00</td><td>Информатика</td><td>310</td><td class="hw">Задача на циклы</td></tr>
+          </table>
+        </div>
+        <div class="dn-card">
+          <h3>📰 Новости школы</h3>
+          <ul class="dn-notice">
+            <li><b>10.11</b> — Олимпиада по математике в субботу, 10:00.</li>
+            <li><b>07.11</b> — Родительское собрание в пятницу, 18:00.</li>
+            <li><b>05.11</b> — Запись в кружки второго полугодия.</li>
+          </ul>
+        </div>
+      </div>
+      <div>
+        <div class="dn-card">
+          <h3>🔔 Уведомления</h3>
+          <ul class="dn-notice">
+            <li>Контрольная по физике перенесена.</li>
+            <li>Сдайте деньги на экскурсию.</li>
+            <li>Не забудьте сменную обувь.</li>
+          </ul>
+        </div>
+        <div class="dn-card">
+          <h3>📊 Успеваемость</h3>
+          <p class="dn-notice">Средний балл: <b>4,42</b><br>Пропусков: <b>2</b><br>Место: <b>6 из 28</b></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="dn-page" id="dnp-diary">
+    <div class="dn-greeting">Дневник · 9–14 ноября</div>
+    <div class="dn-card">
+      <h3>Понедельник, 09.11</h3>
+      <table class="dn-table">
+        <tr><th>Урок</th><th>Оценка</th><th>Домашнее задание</th></tr>
+        <tr><td>Алгебра</td><td><span class="mark m5">5</span> <span class="mark m4">4</span></td><td class="hw">№ 408–410</td></tr>
+        <tr><td>Литература</td><td>—</td><td class="hw">Прочитать «Мёртвые души»</td></tr>
+        <tr><td>География</td><td><span class="mark m3">3</span></td><td class="hw">Контурная карта</td></tr>
+        <tr><td>Биология</td><td>—</td><td class="hw">§ 21, вопросы 1–5</td></tr>
+      </table>
+    </div>
+    <div class="dn-card">
+      <h3>Вторник, 10.11 — сегодня</h3>
+      <table class="dn-table">
+        <tr><th>Урок</th><th>Оценка</th><th>Домашнее задание</th></tr>
+        <tr><td>Алгебра</td><td><span class="mark m5">5</span></td><td class="hw">№ 412, 415</td></tr>
+        <tr><td>Русский язык</td><td>—</td><td class="hw">Упр. 287</td></tr>
+        <tr><td>Физика</td><td><span class="mark m4">4</span></td><td class="hw">Повторить § 14</td></tr>
+        <tr><td>Английский</td><td><span class="mark m5">5</span></td><td class="hw">Слова Unit 4</td></tr>
+        <tr><td>История</td><td>—</td><td class="hw">Параграф 19</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="dn-page" id="dnp-schedule">
+    <div class="dn-greeting">Расписание на неделю</div>
+    <div class="dn-card">
+      <table class="dn-table">
+        <tr><th>День</th><th>Уроки</th></tr>
+        <tr><td><b>Пн</b></td><td>Алгебра · Литература · География · Обед · Биология · ОБЖ</td></tr>
+        <tr><td><b>Вт</b></td><td>Алгебра · Русский язык · Физика · Обед · Английский · История · Физкультура</td></tr>
+        <tr><td><b>Ср</b></td><td>Геометрия · Химия · Обед · Литература · Обществознание · Информатика</td></tr>
+        <tr><td><b>Чт</b></td><td>Алгебра · Физика · Обед · Русский язык · Английский · Музыка · ИЗО</td></tr>
+        <tr><td><b>Пт</b></td><td>Геометрия · История · Обед · Биология · Русский язык · Технология</td></tr>
+        <tr><td><b>Сб</b></td><td>Олимпиада по математике, 10:00</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="dn-page" id="dnp-grades">
+    <div class="dn-greeting">Оценки · II четверть</div>
+    <div class="dn-card">
+      <h3>Итоговые оценки</h3>
+      <div class="subj-row"><span>Алгебра</span><span class="subj-avg">4,6</span></div>
+      <div class="subj-row"><span>Геометрия</span><span class="subj-avg">4,2</span></div>
+      <div class="subj-row"><span>Русский язык</span><span class="subj-avg">4,8</span></div>
+      <div class="subj-row"><span>Литература</span><span class="subj-avg">5,0</span></div>
+      <div class="subj-row"><span>Физика</span><span class="subj-avg">3,8</span></div>
+      <div class="subj-row"><span>Химия</span><span class="subj-avg">4,0</span></div>
+      <div class="subj-row"><span>Английский</span><span class="subj-avg">4,7</span></div>
+      <div class="subj-row"><span>История</span><span class="subj-avg">4,5</span></div>
+      <div class="subj-row"><span>Информатика</span><span class="subj-avg">5,0</span></div>
+      <div class="subj-row"><span>Физкультура</span><span class="subj-avg">4,9</span></div>
+    </div>
+  </div>
+
+  <div class="dn-page" id="dnp-messages">
+    <div class="dn-greeting">Сообщения</div>
+    <div class="dn-card">
+      <div class="msg"><b class="time">Сегодня, 08:14</b><b>Классный руководитель</b><span>Не забудь сдать тетради по алгебре.</span></div>
+      <div class="msg"><b class="time">Вчера, 19:42</b><b>Смирнова А. П.</b><span>Сочинение принято, 5. Молодец!</span></div>
+      <div class="msg"><b class="time">Вчера, 12:30</b><b>Школьная столовая</b><span>Пополните баланс питания.</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="ad-countdown" id="countdown"></div>
+<button class="secret-btn" id="secretBtn" onclick="openSecret()" title="???">🔒</button>
+
+<!-- ============ РЕКЛАМА ============ -->
+<div class="overlay" id="overlay">
+  <div class="modal ad-window">
+    <button class="ad-close" onclick="closeAd()">✕ закрыть</button>
+    <div class="v-logo" style="justify-content:center; margin-bottom:18px;">
+      <div class="v-mark"><div class="dot"></div></div>
+      <div class="v-name" style="color:#fff;">ВКУСНО <span class="yellow">и почка</span></div>
+    </div>
+    <div class="ad-title">Хочешь Вкусно — и почка?</div>
+    <p class="ad-text">Биг Спешиал, картофель фри и Айс Де Люкс уже ждут.<br>И даже можно подработать на кухне! 🍔</p>
+    <button class="btn-vkst" onclick="toVkusno()">Я хочу Вкусно и почка!</button>
+  </div>
+</div>
+
+<!-- ============ ВКУСНО И ПОЧКА ============ -->
+<div class="vkst" id="vkst">
+  <header class="vkst-header">
+    <div class="v-logo">
+      <div class="v-mark"><div class="dot"></div></div>
+      <div class="v-name">ВКУСНО <span class="yellow">и почка</span></div>
+    </div>
+    <button class="btn-menu" onclick="showVkPage('menu', this)">☰ Меню</button>
+    <span class="link" onclick="showVkPage('promos', this)">Акции</span>
+    <span class="link" onclick="showVkPage('rests', this)">Рестораны</span>
+    <span class="link" onclick="backToDnevnik()">← Вернуться в Дочку.ру</span>
+    <button class="order-btn" id="orderBtn" onclick="trackMyOrder()">📦 Мой заказ</button>
+    <button class="cart-btn" onclick="openCart()">🛒 Корзина <span class="cart-badge" id="cartCount">0</span></button>
+    <button class="cart-btn" onclick="openGame()" style="background:#f5d100;color:#1e3b2f;border-color:#f5d100;">🎮 Играть</button>
+    <button class="cart-btn" onclick="openCasino()" style="background:#4a1f3a;color:#f5d100;border-color:#4a1f3a;">🎰 Казино</button>
+  </header>
+
+  <div class="vkst-banner">
+    <h1>Вкусно — и почка.</h1>
+    <p>Тот самый вкус, который знаешь и любишь. А ещё — мини-игра, казино и стройка!</p>
+    <button class="btn-order" onclick="showVkPage('menu')">Открыть меню</button>
+  </div>
+
+  <div class="vkst-main" id="menuSection">
+    <div class="vk-page active" id="vkp-menu">
+      <div class="menu-tabs">
+        <button class="tab active" onclick="showTab('burgers', this)">Бургеры</button>
+        <button class="tab" onclick="showTab('snacks', this)">Снеки</button>
+        <button class="tab" onclick="showTab('drinks', this)">Напитки</button>
+        <button class="tab" onclick="showTab('desserts', this)">Десерты</button>
+        <button class="tab" onclick="showTab('combos', this)">Комбо</button>
+      </div>
+      <div class="tab-panel active" id="tab-burgers"><div class="menu-grid" id="grid-burgers"></div></div>
+      <div class="tab-panel" id="tab-snacks"><div class="menu-grid" id="grid-snacks"></div></div>
+      <div class="tab-panel" id="tab-drinks"><div class="menu-grid" id="grid-drinks"></div></div>
+      <div class="tab-panel" id="tab-desserts"><div class="menu-grid" id="grid-desserts"></div></div>
+      <div class="tab-panel" id="tab-combos"><div class="menu-grid" id="grid-combos"></div></div>
+    </div>
+
+    <div class="vk-page" id="vkp-promos">
+      <div class="promo-hero" style="background:linear-gradient(120deg,#1e3b2f,#2c5544);">
+        <div class="ph-emoji">🔥</div>
+        <div><span class="tag">Только на этой неделе</span><h3>Два Гранда по цене одного</h3><p>Каждый вторник второй бургер «Гранд» — в подарок.</p></div>
+      </div>
+      <div class="promo-grid">
+        <div class="promo-card" style="background:linear-gradient(120deg,#e8542f,#f5a623);"><div class="big-e">🍱</div><b>Комбо дня — 399 ₽</b><span>Биг Спешиал + фри + напиток.</span></div>
+        <div class="promo-card" style="background:linear-gradient(120deg,#1e3b2f,#4a7a63);"><div class="big-e">🎓</div><b>Студенческий −15%</b><span>С 14:00 до 17:00.</span></div>
+        <div class="promo-card" style="background:linear-gradient(120deg,#2a4d9b,#4b8fd6);"><div class="big-e">🍦</div><b>1 + 1 на мороженое</b><span>Купи два рожка — заплати за один.</span></div>
+      </div>
+    </div>
+
+    <div class="vk-page" id="vkp-rests">
+      <h2 style="color:#1f2d3d; margin-bottom:16px;">📍 Рестораны в Хабаровске</h2>
+      <div class="rest-card"><div class="rest-emoji">🏬</div><div style="flex:1;"><b>ул. Льва Толстого, 19/9 <span class="rate">4,4 ★</span><span class="rest-status rs-open">Открыто до 00:00</span></b><span class="addr">Центр, рядом со стадионом</span><div class="meta">07:00–00:00 · Доставка, навынос</div></div></div>
+      <div class="rest-card"><div class="rest-emoji">🏙️</div><div style="flex:1;"><b>ул. Муравьёва-Амурского, 7 <span class="rate">4,3 ★</span><span class="rest-status rs-open">Открыто до 02:00</span></b><span class="addr">Главный ресторан</span><div class="meta">07:00–02:00 · Доставка, навынос</div></div></div>
+      <div class="rest-card"><div class="rest-emoji">🚗</div><div style="flex:1;"><b>«Вкусно — и почка. Авто» <span class="rate">4,2 ★</span><span class="rest-status rs-24">Круглосуточно</span></b><span class="addr">МакАвто</span><div class="meta">Круглосуточно · Доставка, навынос</div></div></div>
+    </div>
+  </div>
+
+  <footer class="vkst-footer">© 2026 «Вкусно — и почка». Демонстрационный сайт-шутка.</footer>
+</div>
+
+<!-- ============ ИГРА ============ -->
+<div class="vkst" id="gameScreen" style="display:none;">
+  <div class="game-bar">
+    <span class="title">🍳 Кухня «Вкусно — и почка»</span>
+    <span class="stat cash">💰 Баланс: <b id="gCash">0</b> ₽</span>
+    <span class="stat debt" id="gDebtWrap">🏦 Долг: <b id="gDebt">0</b> ₽ <span id="gDebtTimer"></span></span>
+    <span class="stat">⚡ <b id="gEnergy">100</b>/100</span>
+    <button class="game-tab active" id="gtab-cook" onclick="gameTab('cook', this)">🍔 Готовка</button>
+    <button class="game-tab" id="gtab-recipes" onclick="gameTab('recipes', this)">📖 Рецепты</button>
+    <button class="game-tab" id="gtab-shop" onclick="gameTab('shop', this)">🛍️ Магазин</button>
+    <button class="game-tab" id="gtab-credit" onclick="gameTab('credit', this)">🏦 Кредит</button>
+    <button class="game-tab" id="gtab-leaders" onclick="gameTab('leaders', this)">🏆 Лидеры</button>
+    <button class="game-tab" id="gtab-build" onclick="gameTab('build', this)" style="display:none;background:#e8542f;border-color:#e8542f;">🏗️ Стройка</button>
+    <button class="game-tab" id="gtab-doom" onclick="gameTab('doom', this)" style="display:none;background:#8b0000;border-color:#8b0000;">🔫 Бой</button>
+    <button class="game-tab" onclick="openCasino()" style="background:#4a1f3a;border-color:#4a1f3a;color:#f5d100;">🎰 Казино</button>
+    <button class="game-tab" onclick="backToVkst()">← В меню</button>
+  </div>
+
+  <div class="game-main">
+    <div class="game-view active" id="gview-cook">
+      <div class="build-banner" id="buildBanner" onclick="openBuildTab()">
+        <div class="ico">🏗️</div>
+        <div><b>Работа на стройке «Вкусно и почка»</b><br><span>Требуются рабочие! Хорошая оплата. Нажми, чтобы узнать больше.</span></div>
+      </div>
+      <div class="daily-bonus" id="dailyBonus" style="display:none;">
+        <span>🎁 Ежедневный бонус ждёт!</span>
+        <button onclick="claimDailyBonus()">Забрать</button>
+      </div>
+      <h2 style="color:#1e3b2f; margin-bottom:6px;">Готовь и зарабатывай</h2>
+      <p style="color:#8a97a5; font-size:14px; margin-bottom:18px;">Выбери блюдо и пройди мини-игру.</p>
+      <div style="margin-bottom:16px; font-size:14px; color:#4a5568;">
+        ⚡ Энергия: <b id="gEnergyCook">100</b>/100
+        <div style="height:10px; background:#e3e8ed; border-radius:6px; margin-top:6px; overflow:hidden;">
+          <div id="gEnergyBar" style="height:100%; width:100%; background:linear-gradient(90deg,#f5d100,#e8542f); transition:width .3s;"></div>
+        </div>
+      </div>
+      <div style="display:flex; gap:10px; margin-bottom:14px; flex-wrap:wrap;">
+        <button class="btn-yellow" style="width:auto;padding:9px 18px;" onclick="callManager()">🧑‍💼 Позвать менеджера</button>
+        <button class="btn-yellow" style="width:auto;padding:9px 18px;background:#4a1f3a;color:#f5d100;" onclick="openCasino()">🎰 В казино</button>
+        <button class="btn-yellow" style="width:auto;padding:9px 18px;background:#e8542f;color:#fff;" onclick="openBuildTab()">🏗️ На стройку</button>
+      </div>
+      <div class="game-grid" id="cookGrid"></div>
+    </div>
+
+    <div class="game-view" id="gview-recipes">
+      <h2 style="color:#1e3b2f; margin-bottom:6px;">Новые рецепты</h2>
+      <p style="color:#8a97a5; font-size:14px; margin-bottom:18px;">Покупай рецепты, чтобы готовить дороже.</p>
+      <div class="game-grid" id="recipesGrid"></div>
+    </div>
+
+    <div class="game-view" id="gview-shop">
+      <h2 style="color:#1e3b2f; margin-bottom:6px;">Магазин мечты</h2>
+      <p style="color:#8a97a5; font-size:14px; margin-bottom:18px;">Копи и покупай: телефон, машина, квартира, отпуск.</p>
+      <div class="shop-grid" id="shopGrid"></div>
+      <div class="goals-panel" id="goalsPanel"></div>
+    </div>
+
+    <div class="game-view" id="gview-credit">
+      <div class="credit-box" id="creditBox"></div>
+    </div>
+
+    <div class="game-view" id="gview-leaders">
+      <div class="leaderboard">
+        <h3>🏆 Таблица лидеров</h3>
+        <div class="name-form">
+          <input id="lbName" placeholder="Твоё имя" maxlength="20">
+          <button onclick="saveLeaderName()">Сохранить</button>
+        </div>
+        <div id="lbList"></div>
+        <p style="font-size:12px; color:#8a97a5; margin-top:10px;">Рейтинг по максимальному балансу.</p>
+      </div>
+    </div>
+
+    <!-- Стройка -->
+    <div class="game-view" id="gview-build">
+      <h2 style="color:#1e3b2f; margin-bottom:6px;">🏗️ Стройка «Вкусно и почка»</h2>
+      <p style="color:#8a97a5; font-size:14px; margin-bottom:18px;">Построй свой ресторан с нуля. Каждый этап стоит денег и открывает новые бонусы.</p>
+      <div class="build-progress"><div id="buildProgressBar" style="width:0%"></div></div>
+      <p style="font-size:13px; color:#4a5568; margin:8px 0 18px;">Прогресс: <b id="buildProgressText">0%</b></p>
+      <div class="build-grid" id="buildGrid"></div>
+    </div>
+
+    <!-- НОВЫЙ БОЙ DOOM -->
+    <div class="game-view" id="gview-doom">
+      <h2 style="color:#8b0000; margin-bottom:6px;">🔫 Бой с Архитектором</h2>
+      <p style="color:#8a97a5; font-size:14px; margin-bottom:14px;">Контракт подписан. Уничтожь архитекторов! Клик — выстрел. WASD — движение, мышь — поворот.</p>
+      <div class="doom-container" id="doomContainer">
+        <canvas class="doom-canvas" id="doomCanvas" width="800" height="450"></canvas>
+        <div class="doom-crosshair" style="display:none;" id="doomCrosshair"></div>
+        <div class="doom-hud">
+          <span>AMMO: <span id="doomAmmo">50</span></span>
+          <span>HEALTH: <span id="doomHp">100</span>%</span>
+          <span>KILLS: <span id="doomKills">0</span></span>
+        </div>
+        <div class="doom-weapons">
+          <button class="doom-weapon-btn active" onclick="setWeapon(1)">1. Пистолет</button>
+          <button class="doom-weapon-btn" onclick="setWeapon(2)">2. Дробовик</button>
+          <button class="doom-weapon-btn" onclick="setWeapon(3)">3. Плазма</button>
+        </div>
+      </div>
+      <div style="text-align:center; margin-top:15px;">
+        <button class="btn-yellow" onclick="startDoom()" style="max-width:300px; margin:0 auto;">▶ Начать бой</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ КАЗИНО ============ -->
+<div class="vkst" id="casinoScreen" style="display:none;">
+  <div class="game-bar">
+    <span class="title">🎰 Казино «Вкусно — и почка»</span>
+    <span class="stat cash">💰 Баланс: <b id="cCash">0</b> ₽</span>
+    <button class="game-tab" onclick="backToGame()">← На кухню</button>
+    <button class="game-tab" onclick="backToVkst()">← В меню</button>
+  </div>
+  <div class="game-main">
+    <div class="casino-wrap">
+      <div class="casino-head">
+        <h2>🎰 Казино</h2>
+        <p>Испытай удачу: колесо фортуны или слоты. Ставки — с баланса кухни.</p>
+        <div class="casino-balance">Баланс: <span id="cCash2">0</span> ₽</div>
+      </div>
+      <div class="casino-tabs">
+        <button class="casino-tab active" id="ctab-wheel" onclick="casinoTab('wheel', this)">🎡 Колесо</button>
+        <button class="casino-tab" id="ctab-slots" onclick="casinoTab('slots', this)">🎰 Слоты</button>
+      </div>
+      <div class="casino-panel active" id="cpanel-wheel">
+        <div class="wheel-box">
+          <div class="wheel-outer">
+            <div class="wheel-pointer">▼</div>
+            <svg class="wheel-svg" id="wheelSvg" viewBox="0 0 200 200"></svg>
+            <div class="wheel-center">SPIN</div>
+          </div>
+          <div class="bet-row">
+            <label>Ставка:</label>
+            <input id="wheelBet" type="number" value="100" min="10" step="10">
+            <button id="wheelSpinBtn" onclick="spinWheel()">Крутить!</button>
+          </div>
+          <div class="casino-hint">Сектора: x0, x1, x1.5, x2, x3, x5.</div>
+        </div>
+      </div>
+      <div class="casino-panel" id="cpanel-slots">
+        <div class="slots-box">
+          <div class="slots-reels">
+            <div class="slot-reel" id="reel0">🍒</div>
+            <div class="slot-reel" id="reel1">🍋</div>
+            <div class="slot-reel" id="reel2">🍊</div>
+          </div>
+          <div class="slots-result" id="slotsResult"></div>
+          <div class="bet-row">
+            <label>Ставка:</label>
+            <input id="slotsBet" type="number" value="100" min="10" step="10">
+            <button id="slotsSpinBtn" onclick="spinSlots()">Играть!</button>
+          </div>
+          <div class="casino-hint">Три одинаковых: 🍒×3, 🍋×4, 🍊×5, 💎×10, 7️⃣×20. Две — x1.5.</div>
+        </div>
+      </div>
+      <div class="casino-history">
+        <h4>📜 История ставок</h4>
+        <div id="casinoHistory"><p class="ch-empty">Пока пусто. Сделай первую ставку!</p></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Менеджер -->
+<div class="manager-widget hidden" id="managerWidget">
+  <div class="manager-bubble" id="managerBubble"></div>
+  <div class="manager-figure" onclick="managerSpeak(true)">
+    <span class="head">🧑‍💼</span>
+    <span class="arms"><span>🙌</span><span>🙌</span></span>
+    <span class="badge">Архитектор</span>
+  </div>
+  <div class="manager-controls">
+    <button onclick="managerSpeak(true)">💬</button>
+    <button class="ghost" onclick="dismissManager()">Выгнать</button>
+  </div>
+</div>
+
+<!-- Корзина -->
+<div class="overlay" id="cartOverlay">
+  <div class="modal cart-modal" id="cartModalBody"></div>
+</div>
+
+<!-- Секретный контракт -->
+<div class="overlay" id="secretOverlay">
+  <div class="modal" style="max-width:600px;">
+    <h3 style="color:#8b0000; font-size:22px; margin-bottom:8px; text-align:center;">📜 Контракт с Архитектором</h3>
+    <p style="font-size:14px; color:#4a5568; line-height:1.6; margin-bottom:14px;">
+      Я, <b id="contractName">игрок</b>, добровольно подписываю контракт с Архитектором. Я обязуюсь работать лучше, не быть бездарью и, если потребуется, вступить в бой с Архитекторами, чтобы доказать свою состоятельность.
+    </p>
+    <p style="font-size:13px; color:#8a97a5; margin-bottom:18px;">
+      После подписания: открывается вкладка <b>«🔫 Бой»</b> — шутер в стиле DOOM, где враги — архитекторы разных типов. У каждого своя уязвимость к оружию: пистолет / дробовик / плазма.
+    </p>
+    <div class="field">
+      <label>Подпись (твоё имя)</label>
+      <input id="contractSign" placeholder="Введи имя">
+    </div>
+    <button class="btn-primary" style="background:#8b0000;" onclick="signContract()">✍ Подписать контракт</button>
+    <button style="background:none;border:none;color:#8a97a5;font-size:13px;margin:10px auto 0;display:block;cursor:pointer;text-decoration:underline;" onclick="closeSecret()">Пока не готов</button>
+  </div>
+</div>
+
+<!-- Регистрация -->
+<div class="overlay" id="regOverlay">
+  <div class="modal reg-modal">
+    <h3>👋 Добро пожаловать!</h3>
+    <p>Давай познакомимся. Как тебя зовут?</p>
+    <div class="field">
+      <label>Твоё имя</label>
+      <input id="regName" placeholder="Например, Иван" maxlength="20">
+    </div>
+    <div class="field">
+      <label>Выбери аватар</label>
+      <div class="avatar-choice" id="avatarChoice">
+        <button class="sel" data-ava="👨‍🍳">👨‍🍳</button>
+        <button data-ava="👩‍🍳">👩‍🍳</button>
+        <button data-ava="🦸">🦸</button>
+        <button data-ava="🐱">🐱</button>
+        <button data-ava="🤖">🤖</button>
+      </div>
+    </div>
+    <button class="btn-primary" onclick="doRegister()">Начать игру!</button>
+  </div>
+</div>
+
+<div class="event-popup" id="eventPopup">
+  <div class="t" id="eventTitle"></div>
+  <div class="d" id="eventDesc"></div>
+  <button onclick="closeEvent()">Ок</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================================================
+   ЧАСТЬ 1. БАЗОВЫЕ ФУНКЦИИ
+   ============================================================ */
+function dnShow(id, el) {
+  document.querySelectorAll('.dn-page').forEach(function(p){ p.classList.remove('active'); });
+  document.querySelectorAll('.dn-nav a').forEach(function(a){ a.classList.remove('active'); });
+  var page = document.getElementById('dnp-' + id);
+  if (page) page.classList.add('active');
+  if (el) el.classList.add('active');
+  window.scrollTo(0, 0);
+}
+function toVkusno() {
+  var ov = document.getElementById('overlay'); if (ov) ov.classList.remove('show');
+  var dn = document.getElementById('dnevnik'); if (dn) dn.style.display = 'none';
+  var vk = document.getElementById('vkst'); if (vk) vk.classList.add('show');
+  var cd = document.getElementById('countdown'); if (cd) cd.classList.remove('show');
+  document.title = 'Вкусно — и почка';
+  window.scrollTo(0, 0);
+}
+function closeAd() {
+  var ov = document.getElementById('overlay'); if (ov) ov.classList.remove('show');
+}
+function backToDnevnik() {
+  var vk = document.getElementById('vkst'); if (vk) vk.classList.remove('show');
+  var gs = document.getElementById('gameScreen'); if (gs) gs.style.display = 'none';
+  var cs = document.getElementById('casinoScreen'); if (cs) cs.style.display = 'none';
+  var dn = document.getElementById('dnevnik'); if (dn) dn.style.display = 'block';
+  document.title = 'Дочка.ру';
+  window.scrollTo(0, 0);
+}
+function showTab(id, btn) {
+  document.querySelectorAll('.tab-panel').forEach(function(p){ p.classList.remove('active'); });
+  document.querySelectorAll('.tab').forEach(function(t){ t.classList.remove('active'); });
+  var panel = document.getElementById('tab-' + id); if (panel) panel.classList.add('active');
+  if (btn) btn.classList.add('active');
+}
+function showVkPage(id, el) {
+  document.querySelectorAll('.vk-page').forEach(function(p){ p.classList.remove('active'); });
+  document.querySelectorAll('.vkst-header .link').forEach(function(l){ l.classList.remove('active'); });
+  var page = document.getElementById('vkp-' + id); if (page) page.classList.add('active');
+  if (el) el.classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+/* ============================================================
+   ЧАСТЬ 2. РЕКЛАМА
+   ============================================================ */
+(function() {
+  var secondsLeft = 5;
+  function tick() {
+    var cd = document.getElementById('countdown');
+    if (!cd) return;
+    cd.classList.add('show');
+    if (secondsLeft > 0) {
+      cd.textContent = '🔔 Реклама через ' + secondsLeft + ' с…';
+      secondsLeft--;
+      setTimeout(tick, 1000);
+    } else {
+      cd.classList.remove('show');
+      var ov = document.getElementById('overlay');
+      if (ov) ov.classList.add('show');
+    }
+  }
+  window.addEventListener('load', function() { setTimeout(tick, 800); });
+})();
+
+/* ============================================================
+   ЧАСТЬ 3. ДАННЫЕ
+   ============================================================ */
+var photoGrads = {
+  burger:'linear-gradient(135deg,#f9c74f,#f3722c)', chicken:'linear-gradient(135deg,#fbd97a,#e8963e)',
+  fish:'linear-gradient(135deg,#89c2d9,#4a7fb5)', fries:'linear-gradient(135deg,#ffe08a,#f5a623)',
+  nuggets:'linear-gradient(135deg,#fbd48a,#d98a2b)', drink:'linear-gradient(135deg,#8ecae6,#2a4d9b)',
+  coffee:'linear-gradient(135deg,#c8a27a,#6f4e37)', ice:'linear-gradient(135deg,#ffd6e0,#f5a6c8)',
+  sweet:'linear-gradient(135deg,#f8b4c0,#c86a8a)', combo:'linear-gradient(135deg,#f5d100,#e8542f)'
+};
+var menu = {
+  burgers: [
+    { e:'🍔', n:'Биг Спешиал', d:'Два бифштекса, сыр Чеддер, огурчики', p:335, g:'burger', energy:15 },
+    { e:'🍔', n:'Биг Хит', d:'Четыре бифштекса, салат «Айсберг»', p:416, g:'burger', energy:20 },
+    { e:'🍔', n:'Гранд', d:'Двойной сыр, карамелизованная булочка', p:350, g:'burger', energy:18, promo:'2 по цене 1' },
+    { e:'🥪', n:'Чизбургер', d:'Бифштекс, сыр Чеддер, кетчуп', p:121, g:'burger', energy:8 },
+    { e:'🐔', n:'Чикенбургер', d:'Куриный бифштекс, салат, соус', p:130, g:'chicken', energy:9 }
+  ],
+  snacks: [
+    { e:'🍟', n:'Картофель Фри Большой', d:'Хрустящий, из фритюра', p:222, g:'fries', energy:10 },
+    { e:'🍗', n:'Наггетсы (4 шт.)', d:'С соусом на выбор', p:100, g:'nuggets', energy:6 },
+    { e:'🧅', n:'Луковые кольца', d:'Хрустящие, в панировке', p:135, g:'nuggets', energy:8 }
+  ],
+  drinks: [
+    { e:'🥤', n:'Кока-Кола', d:'0,4 л', p:109, g:'drink', energy:12 },
+    { e:'☕', n:'Капучино', d:'Эспрессо и молочная пенка', p:105, g:'coffee', energy:8 },
+    { e:'🥛', n:'Молочный коктейль', d:'Ваниль, шоколад или клубника', p:119, g:'ice', energy:14 }
+  ],
+  desserts: [
+    { e:'🍦', n:'Вафельный рожок', d:'Классическое мороженое', p:39, g:'ice', energy:6, promo:'1+1' },
+    { e:'🍩', n:'Донат', d:'С шоколадным кремом', p:89, g:'sweet', energy:9 }
+  ],
+  combos: [
+    { e:'🍱', n:'Биг Спешиал Комбо', d:'Бургер + фри + напиток', p:490, g:'combo', energy:30, promo:'399 ₽', pp:399 },
+    { e:'📦', n:'Мега Бокс', d:'На компанию', p:530, g:'combo', energy:35 }
+  ]
+};
+var RECIPES = [
+  { id:'fries',   n:'Картофель фри', e:'🍟', cost:40,  profit:35,  buy:0,    energy:8,  g:'fries',  type:'fryer',   desc:'Погружай и вовремя вынимай.' },
+  { id:'cheese',  n:'Чизбургер',     e:'🍔', cost:70,  profit:60,  buy:120,  energy:12, g:'burger', type:'burger',  desc:'Собери бургер по порядку.' },
+  { id:'nuggets', n:'Наггетсы',      e:'🍗', cost:90,  profit:80,  buy:200,  energy:14, g:'nuggets',type:'fryer',   desc:'Не пережарь!' },
+  { id:'cola',    n:'Кока-Кола',     e:'🥤', cost:30,  profit:25,  buy:80,   energy:5,  g:'drink',  type:'drink',   desc:'Налей до нужного уровня.' },
+  { id:'bigspecial',n:'Биг Спешиал', e:'🍔', cost:160, profit:150, buy:350,  energy:20, g:'burger', type:'burger',  desc:'Двойной бургер — точность.' },
+  { id:'bigmac',  n:'Биг Хит',       e:'🍔', cost:220, profit:210, buy:600,  energy:26, g:'burger', type:'burger',  desc:'Много слоёв.' },
+  { id:'combo',   n:'Комбо дня',     e:'🍱', cost:260, profit:300, buy:900,  energy:30, g:'combo',  type:'drink',   desc:'Напиток + бургер.' },
+  { id:'mega',    n:'Мега Бокс',     e:'📦', cost:400, profit:520, buy:1500, energy:40, g:'combo',  type:'fryer',   desc:'Максимальная прибыль.' }
+];
+var SHOP_ITEMS = [
+  { id:'phone',    n:'Новый телефон',   e:'📱', price:5000,   desc:'Смартфон мечты.' },
+  { id:'bike',     n:'Велосипед',       e:'🚲', price:12000,  desc:'Для поездок по городу.' },
+  { id:'console',  n:'Игровая консоль', e:'🎮', price:25000,  desc:'Отдых после смены.' },
+  { id:'car',      n:'Машина',          e:'🚗', price:80000,  desc:'Первое авто.' },
+  { id:'apartment',n:'Квартира',        e:'🏠', price:250000, desc:'Своё жильё.' },
+  { id:'vacation', n:'Отпуск на море',  e:'🏖️', price:400000, desc:'Мальдивы ждут.' }
+];
+var CREDIT_OPTIONS = [
+  { amount: 5000,  label: '5 000 ₽' },
+  { amount: 10000, label: '10 000 ₽' },
+  { amount: 25000, label: '25 000 ₽' }
+];
+var BUILD_STAGES = [
+  { id:'foundation', n:'Фундамент', e:'🧱', price:3000,  desc:'Залить фундамент ресторана.' },
+  { id:'walls',      n:'Стены',     e:'🧱', price:5000,  desc:'Возвести стены.' },
+  { id:'roof',       n:'Крыша',     e:'🏠', price:7000,  desc:'Накрыть крышу.' },
+  { id:'sign',       n:'Вывеска',   e:'🪧', price:4000,  desc:'Повесить вывеску «Вкусно и почка».' },
+  { id:'kitchen',    n:'Кухня',     e:'🍳', price:10000, desc:'Установить оборудование.' },
+  { id:'open',       n:'Открытие',  e:'🎉', price:15000, desc:'Открыть ресторан!' }
+];
+
+/* ============================================================
+   ЧАСТЬ 4. СОСТОЯНИЕ
+   ============================================================ */
+var SAVE_KEY = 'vkusno_pochka_v6';
+var ENERGY_REGEN_MS = 4000;
+var STEP_DEBT_MS = 5 * 60 * 1000;
+
+var state = {
+  cash: 200, debt: 5000, debtBase: 5000, debtDue: Date.now() + STEP_DEBT_MS,
+  energy: 100, owned: { fries: true }, ownedShop: {}, lastEnergyTick: Date.now(),
+  bestCash: 200, playerName: 'Игрок', avatar: '👨‍🍳', registered: false,
+  lastDailyBonus: 0, casinoHistory: [],
+  contractSigned: false, buildProgress: {},
+  doomKills: 0, doomWave: 1
+};
+
+function save() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(state)); } catch(e) {} }
+function load() {
+  try {
+    var raw = localStorage.getItem(SAVE_KEY);
+    if (raw) {
+      var parsed = JSON.parse(raw);
+      for (var k in parsed) if (parsed.hasOwnProperty(k)) state[k] = parsed[k];
+    }
+  } catch(e) {}
+}
+load();
+
+function fmt(n) { return Math.round(n).toLocaleString('ru-RU'); }
+
+function regenEnergy() {
+  var now = Date.now();
+  var diff = now - state.lastEnergyTick;
+  if (diff > 5 * 60 * 1000 || diff < 0) {
+    state.lastEnergyTick = now; save(); return;
+  }
+  var ticks = Math.floor(diff / ENERGY_REGEN_MS);
+  if (ticks > 0) {
+    state.energy = Math.min(100, state.energy + ticks);
+    state.lastEnergyTick += ticks * ENERGY_REGEN_MS;
+    updateHUD(); save();
+  }
+}
+setInterval(regenEnergy, 2000);
+
+function updateHUD() {
+  var el = function(id){ return document.getElementById(id); };
+  if (el('gCash')) el('gCash').textContent = fmt(state.cash);
+  if (el('gDebt')) el('gDebt').textContent = fmt(state.debt);
+  if (el('gDebtWrap')) el('gDebtWrap').classList.toggle('hidden', state.debt <= 0);
+  if (el('gEnergy')) el('gEnergy').textContent = Math.floor(state.energy);
+  if (el('gEnergyCook')) el('gEnergyCook').textContent = Math.floor(state.energy);
+  if (el('gEnergyBar')) el('gEnergyBar').style.width = state.energy + '%';
+  if (el('cCash')) el('cCash').textContent = fmt(state.cash);
+  if (el('cCash2')) el('cCash2').textContent = fmt(state.cash);
+  var timerEl = el('gDebtTimer');
+  if (timerEl) {
+    if (state.debt > 0 && state.debtDue) {
+      var left = state.debtDue - Date.now();
+      if (left > 0) {
+        var m = Math.floor(left / 60000), s = Math.floor((left % 60000) / 1000);
+        timerEl.textContent = '(до платежа ' + m + ':' + String(s).padStart(2,'0') + ')';
+      } else timerEl.textContent = '(просрочено!)';
+    } else timerEl.textContent = '';
+  }
+  if (el('dailyBonus')) {
+    var today = new Date().toDateString();
+    el('dailyBonus').style.display = state.lastDailyBonus !== today ? 'flex' : 'none';
+  }
+  if (el('gtab-build')) el('gtab-build').style.display = state.contractSigned ? 'inline-block' : 'none';
+  if (el('gtab-doom')) el('gtab-doom').style.display = state.contractSigned ? 'inline-block' : 'none';
+}
+
+function toast(msg, type) {
+  var t = document.getElementById('toast');
+  if (!t) return;
+  t.textContent = msg;
+  t.className = 'toast show ' + (type || '');
+  clearTimeout(t._h);
+  t._h = setTimeout(function(){ t.classList.remove('show'); }, 2600);
+}
+
+/* ============================================================
+   ЧАСТЬ 5. МЕНЮ И КОРЗИНА
+   ============================================================ */
+var cart = {};
+
+function renderMenu() {
+  for (var cat in menu) {
+    if (!menu.hasOwnProperty(cat)) continue;
+    var grid = document.getElementById('grid-' + cat);
+    if (!grid) continue;
+    var items = menu[cat];
+    var html = '';
+    for (var i = 0; i < items.length; i++) {
+      var it = items[i];
+      var inCart = cart[it.n] ? cart[it.n].qty : 0;
+      var price = it.pp ? '<span class="old-price">' + it.p + ' ₽</span>' + it.pp + ' ₽' : it.p + ' ₽';
+      var safe = it.n.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+      html += '<div class="item">' +
+        '<div class="photo" style="background:' + photoGrads[it.g] + ';">' +
+          (it.promo ? '<span class="promo-badge">' + it.promo + '</span>' : '') + it.e +
+        '</div>' +
+        '<div class="body">' +
+          '<div class="name">' + it.n + '</div>' +
+          '<div class="desc">' + it.d + '</div>' +
+          '<div class="row"><span class="price">' + price + '</span>' +
+            '<button class="btn-add ' + (inCart ? 'in-cart' : '') + '" onclick="addToCart(\'' + safe + '\')">' +
+              (inCart ? '✓ ' + inCart : '+ В корзину') +
+            '</button>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+    }
+    grid.innerHTML = html;
+  }
+}
+
+function itemByName(name) {
+  for (var cat in menu) {
+    if (!menu.hasOwnProperty(cat)) continue;
+    for (var i = 0; i < menu[cat].length; i++) {
+      if (menu[cat][i].n === name) return menu[cat][i];
+    }
+  }
+  return null;
+}
+function addToCart(name) {
+  if (!cart[name]) cart[name] = { item: itemByName(name), qty: 0 };
+  cart[name].qty++;
+  updateBadge(); renderMenu();
+}
+function changeQty(name, delta) {
+  if (!cart[name]) return;
+  cart[name].qty += delta;
+  if (cart[name].qty <= 0) delete cart[name];
+  updateBadge(); renderMenu(); openCart();
+}
+function cartTotal() {
+  var s = 0;
+  for (var k in cart) if (cart.hasOwnProperty(k)) s += cart[k].item.p * cart[k].qty;
+  return s;
+}
+function cartEnergy() {
+  var s = 0;
+  for (var k in cart) if (cart.hasOwnProperty(k)) s += (cart[k].item.energy || 0) * cart[k].qty;
+  return s;
+}
+function updateBadge() {
+  var el = document.getElementById('cartCount');
+  if (!el) return;
+  var total = 0;
+  for (var k in cart) if (cart.hasOwnProperty(k)) total += cart[k].qty;
+  el.textContent = total;
+}
+
+var authorized = false, deliveryType = 'delivery', lastOrder = null, orderPlacedAt = 0;
+
+function openCart() {
+  var body = document.getElementById('cartModalBody');
+  if (!body) return;
+  var items = [];
+  for (var k in cart) if (cart.hasOwnProperty(k)) items.push(cart[k]);
+  if (items.length === 0) {
+    body.innerHTML = '<h3>🛒 Корзина</h3><div class="cart-empty">Пока пусто. Выбери что-нибудь вкусное 🍔</div><button class="btn-yellow" onclick="closeCart()">Перейти в меню</button>';
+  } else {
+    var html = '<h3>🛒 Корзина</h3>';
+    for (var i = 0; i < items.length; i++) {
+      var x = items[i];
+      var safe = x.item.n.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+      html += '<div class="cart-line">' +
+        '<div class="n">' + x.item.e + ' ' + x.item.n + '<span class="s">' + x.item.p + ' ₽ за шт.</span></div>' +
+        '<div class="qty"><button onclick="changeQty(\'' + safe + '\',-1)">−</button><span>' + x.qty + '</span><button onclick="changeQty(\'' + safe + '\',1)">+</button></div>' +
+        '<div class="sum">' + (x.item.p * x.qty) + ' ₽</div>' +
+      '</div>';
+    }
+    html += '<div class="cart-total"><span>Итого</span><span>' + cartTotal() + ' ₽</span></div>' +
+      '<div class="cart-note">⚡ Восстановит энергии: <b>+' + cartEnergy() + '</b></div>' +
+      '<div class="cart-note">Доставка — 99 ₽, бесплатно от 700 ₽</div>' +
+      '<button class="btn-primary" onclick="startCheckout()">Оформить заказ</button>';
+    body.innerHTML = html;
+  }
+  document.getElementById('cartOverlay').classList.add('show');
+}
+function closeCart() {
+  clearTrackTimers();
+  document.getElementById('cartOverlay').classList.remove('show');
+}
+function startCheckout() { if (!authorized) showLogin(); else showAddress(); }
+function showLogin() {
+  document.getElementById('cartModalBody').innerHTML =
+    '<div class="login-title">Вход в аккаунт</div>' +
+    '<div class="login-sub">Чтобы оформить заказ, войдите</div>' +
+    '<div class="field"><label>Логин</label><input id="loginUser" placeholder="Логин"></div>' +
+    '<div class="field"><label>Пароль</label><input id="loginPass" type="password" placeholder="Пароль"></div>' +
+    '<div class="login-error" id="loginError"></div>' +
+    '<button class="btn-primary" onclick="doLogin()">Войти</button>' +
+    '<p style="font-size:12px; color:#a9b2ba; margin-top:14px; text-align:center;">Демо: логин <b>я</b>, пароль <b>123</b></p>';
+  document.getElementById('cartOverlay').classList.add('show');
+}
+function doLogin() {
+  var u = document.getElementById('loginUser').value.trim();
+  var p = document.getElementById('loginPass').value;
+  if (u === 'я' && p === '123') { authorized = true; showAddress(); }
+  else document.getElementById('loginError').textContent = 'Неверный логин или пароль.';
+}
+function showAddress() {
+  var fee = deliveryType === 'delivery' && cartTotal() < 700 ? 99 : 0;
+  var total = cartTotal() + fee;
+  var canPay = state.cash >= total;
+  document.getElementById('cartModalBody').innerHTML =
+    '<h3>📦 Оформление заказа</h3>' +
+    '<div class="radio-block ' + (deliveryType==='delivery'?'selected':'') + '" onclick="pickDelivery(\'delivery\')">' +
+      '<b>🛵 Доставка курьером</b><span>30–45 минут, 99 ₽ · бесплатно от 700 ₽</span></div>' +
+    '<div id="addrDelivery" class="addr-panel ' + (deliveryType==='delivery'?'show':'') + '">' +
+      '<div class="field"><label>Улица</label><select id="street"><option>ул. Муравьёва-Амурского</option><option>ул. Ленина</option><option>ул. Краснореченская</option></select></div>' +
+      '<div class="two-col"><div class="field"><label>Дом</label><input id="house" placeholder="45"></div>' +
+      '<div class="field"><label>Квартира</label><input id="flat" placeholder="Необязательно"></div></div>' +
+    '</div>' +
+    '<div class="radio-block ' + (deliveryType==='pickup'?'selected':'') + '" onclick="pickDelivery(\'pickup\')">' +
+      '<b>🏃 Самовывоз</b><span>10–15 минут, бесплатно</span></div>' +
+    '<div id="addrPickup" class="addr-panel ' + (deliveryType==='pickup'?'show':'') + '">' +
+      '<div class="field"><label>Ресторан</label><select id="restoPick"><option>ул. Льва Толстого, 19/9</option><option>ул. Муравьёва-Амурского, 7</option><option>Пионерская, 2В</option></select></div>' +
+    '</div>' +
+    '<div class="cart-total"><span>К оплате</span><span>' + total + ' ₽</span></div>' +
+    '<div class="cart-note">Твой баланс: <b>' + fmt(state.cash) + ' ₽</b>' + (canPay ? '' : ' — <span style="color:#c0392b;">не хватает!</span>') + '</div>' +
+    '<button class="btn-primary" onclick="placeOrder()" ' + (canPay ? '' : 'disabled style="background:#a9b2ba;cursor:not-allowed;"') + '>Подтвердить заказ</button>' +
+    '<button style="background:none;border:none;color:#8a97a5;font-size:13px;margin:10px auto 0;display:block;cursor:pointer;text-decoration:underline;" onclick="openCart()">← Вернуться в корзину</button>';
+  document.getElementById('cartOverlay').classList.add('show');
+}
+function pickDelivery(t) { deliveryType = t; showAddress(); }
+function placeOrder() {
+  var fee = deliveryType === 'delivery' && cartTotal() < 700 ? 99 : 0;
+  var total = cartTotal() + fee;
+  if (state.cash < total) { toast('Не хватает денег', 'bad'); return; }
+  var num = Math.floor(100000 + Math.random() * 899999);
+  var itemsArr = [];
+  for (var k in cart) if (cart.hasOwnProperty(k)) itemsArr.push(cart[k].item.n + ' × ' + cart[k].qty);
+  var items = itemsArr.join(', ');
+  var energyGain = cartEnergy();
+  var where;
+  if (deliveryType === 'delivery') {
+    var st = document.getElementById('street').value;
+    var h = document.getElementById('house').value.trim();
+    if (!h) { alert('Укажите номер дома'); return; }
+    where = 'Доставка: ' + st + ', д. ' + h;
+  } else {
+    where = 'Самовывоз: ' + document.getElementById('restoPick').value;
+  }
+  state.cash -= total;
+  state.energy = Math.min(100, state.energy + energyGain);
+  updateHUD(); save();
+  lastOrder = { num: num, items: items, total: total, where: where, deliveryType: deliveryType, energyGain: energyGain };
+  orderPlacedAt = Date.now();
+  cart = {}; updateBadge(); renderMenu();
+  document.getElementById('orderBtn').classList.add('show');
+  showTrack();
+}
+
+var trackTimeouts = [], trackIntervals = [];
+function clearTrackTimers() {
+  trackTimeouts.forEach(clearTimeout); trackTimeouts = [];
+  trackIntervals.forEach(clearInterval); trackIntervals = [];
+}
+var STEP_TIMES = [0, 2, 5, 8, 14];
+function showTrack() {
+  clearTrackTimers();
+  var o = lastOrder;
+  if (!o) return;
+  var isDelivery = o.deliveryType === 'delivery';
+  var steps = [
+    'Заказ принят рестораном',
+    isDelivery ? 'Готовим ваш заказ' : 'Готовим — заберите на кассе',
+    isDelivery ? 'Курьер забрал заказ' : 'Заказ готов',
+    isDelivery ? 'Курьер в пути' : 'Заберите заказ',
+    isDelivery ? 'Доставлен!' : 'Заказ получен!'
+  ];
+  var elapsed = (Date.now() - orderPlacedAt) / 1000;
+  var nowIdx = 0;
+  for (var i = 0; i < STEP_TIMES.length; i++) if (elapsed >= STEP_TIMES[i]) nowIdx = i;
+  var finished = elapsed >= STEP_TIMES[4];
+  var html = '<div style="text-align:center;">' +
+    '<h3 style="color:#1e3b2f; font-size:22px; font-weight:800;">' + (isDelivery ? '🛵 Отслеживание доставки' : '🏃 Самовывоз') + '</h3>' +
+    '<div class="order-num">Заказ № ' + o.num + '</div>' +
+    '<p style="font-size:14px; color:#4a5568;">' + o.items + ' · <b>' + o.total + ' ₽</b><br>' + o.where + '</p>' +
+    '<p style="font-size:13px; color:#1e8a3c; margin-top:6px;">⚡ Энергия: +' + o.energyGain + '</p>' +
+  '</div>' +
+  '<div class="eta">' + (isDelivery ? 'Курьер приедет через' : 'Заказ будет готов через') + ' <b id="etaMin">' + (finished ? 0 : Math.max(0, 28 - Math.floor(elapsed / 2))) + '</b> мин</div>' +
+  '<div class="steps">';
+  for (var j = 0; j < steps.length; j++) {
+    var cls = j < nowIdx ? 'done' : j === nowIdx ? 'now' : '';
+    var dot = j < nowIdx ? '✓' : j === nowIdx ? '•' : '';
+    html += '<div class="step ' + cls + '" id="trackStep' + j + '"><span class="dot">' + dot + '</span><span>' + steps[j] + '</span></div>';
+  }
+  html += '</div>' +
+    '<button class="btn-yellow" style="margin-top:14px;" onclick="closeCart()">Свернуть</button>' +
+    (finished ? '<button class="btn-primary" style="margin-top:8px;background:#e8542f;" onclick="closeMyOrder()">Закрыть заказ</button>' : '');
+  document.getElementById('cartModalBody').innerHTML = html;
+  document.getElementById('cartOverlay').classList.add('show');
+  for (var k = nowIdx + 1; k < STEP_TIMES.length; k++) {
+    (function(idx, delay){
+      if (delay > 0) trackTimeouts.push(setTimeout(function() {
+        var el = document.getElementById('trackStep' + idx);
+        var prev = document.getElementById('trackStep' + (idx - 1));
+        if (el) { el.className = 'step now'; el.querySelector('.dot').textContent = '•'; }
+        if (prev) { prev.className = 'step done'; prev.querySelector('.dot').textContent = '✓'; }
+        if (idx === STEP_TIMES.length - 1) {
+          var eta = document.getElementById('etaMin');
+          if (eta) eta.textContent = '0';
+          refreshTrackFinishBtn();
+        }
+      }, delay));
+    })(k, (STEP_TIMES[k] - elapsed) * 1000);
+  }
+  if (!finished) {
+    var eta = Math.max(0, 28 - Math.floor(elapsed / 2));
+    trackIntervals.push(setInterval(function() {
+      var el = document.getElementById('etaMin');
+      if (!el) return;
+      if (eta > 0) { eta--; el.textContent = eta; }
+    }, 2500));
+  }
+}
+function refreshTrackFinishBtn() {
+  var body = document.getElementById('cartModalBody');
+  if (body && !body.querySelector('.btn-primary[onclick="closeMyOrder()"]')) {
+    var b = document.createElement('button');
+    b.className = 'btn-primary'; b.style.marginTop = '8px'; b.style.background = '#e8542f';
+    b.setAttribute('onclick', 'closeMyOrder()'); b.textContent = 'Закрыть заказ';
+    body.appendChild(b);
+  }
+}
+function closeMyOrder() {
+  clearTrackTimers();
+  lastOrder = null; orderPlacedAt = 0;
+  document.getElementById('orderBtn').classList.remove('show');
+  closeCart();
+}
+function trackMyOrder() { if (lastOrder) showTrack(); }
+
+/* ============================================================
+   ЧАСТЬ 6. ИГРА
+   ============================================================ */
+function openGame() {
+  document.getElementById('vkst').classList.remove('show');
+  document.getElementById('casinoScreen').style.display = 'none';
+  document.getElementById('gameScreen').style.display = 'block';
+  document.getElementById('dnevnik').style.display = 'none';
+  document.title = 'Кухня — Вкусно и почка';
+  gameTab('cook', document.getElementById('gtab-cook'));
+  updateHUD(); renderCook(); renderRecipes(); renderShop(); renderCredit(); renderLeaders(); renderBuild();
+  if (!state.registered) showRegister();
+  showManager();
+  window.scrollTo(0, 0);
+}
+function backToVkst() {
+  document.getElementById('gameScreen').style.display = 'none';
+  document.getElementById('casinoScreen').style.display = 'none';
+  document.getElementById('vkst').classList.add('show');
+  document.title = 'Вкусно — и почка';
+  window.scrollTo(0, 0);
+}
+function backToGame() {
+  document.getElementById('casinoScreen').style.display = 'none';
+  document.getElementById('gameScreen').style.display = 'block';
+  updateHUD();
+  window.scrollTo(0, 0);
+}
+function gameTab(id, el) {
+  document.querySelectorAll('.game-view').forEach(function(v){ v.classList.remove('active'); });
+  document.querySelectorAll('.game-tab').forEach(function(t){ t.classList.remove('active'); });
+  var v = document.getElementById('gview-' + id); if (v) v.classList.add('active');
+  if (el) el.classList.add('active');
+  if (id === 'cook') renderCook();
+  if (id === 'recipes') renderRecipes();
+  if (id === 'shop') renderShop();
+  if (id === 'credit') renderCredit();
+  if (id === 'leaders') renderLeaders();
+  if (id === 'build') renderBuild();
+  if (id === 'doom') initDoom();
+}
+function showRegister() {
+  if (state.registered) return;
+  var inp = document.getElementById('regName');
+  if (inp) inp.value = state.playerName === 'Игрок' ? '' : state.playerName;
+  document.querySelectorAll('#avatarChoice button').forEach(function(b){
+    b.classList.toggle('sel', b.dataset.ava === state.avatar);
+  });
+  document.getElementById('regOverlay').classList.add('show');
+}
+function doRegister() {
+  var name = document.getElementById('regName').value.trim();
+  if (!name) { alert('Введи имя'); return; }
+  state.playerName = name;
+  var sel = document.querySelector('#avatarChoice button.sel');
+  state.avatar = sel ? sel.dataset.ava : '👨‍🍳';
+  state.registered = true;
+  save();
+  document.getElementById('regOverlay').classList.remove('show');
+  updateLeaderEntry();
+  toast('Привет, ' + name + '! 👋', 'good');
+}
+document.addEventListener('click', function(e){
+  if (e.target.matches('#avatarChoice button')) {
+    document.querySelectorAll('#avatarChoice button').forEach(function(b){ b.classList.remove('sel'); });
+    e.target.classList.add('sel');
+  }
+});
+function claimDailyBonus() {
+  var today = new Date().toDateString();
+  if (state.lastDailyBonus === today) { toast('Бонус уже получен сегодня', 'bad'); return; }
+  state.cash += 500;
+  state.lastDailyBonus = today;
+  updateHUD(); save(); renderCook();
+  toast('🎁 Ежедневный бонус: +500 ₽', 'good');
+}
+function renderCook() {
+  var grid = document.getElementById('cookGrid');
+  if (!grid) return;
+  var owned = RECIPES.filter(function(r){ return state.owned[r.id]; });
+  var html = '';
+  for (var i = 0; i < owned.length; i++) {
+    var r = owned[i];
+    html += '<div class="recipe-card">' +
+      '<div class="recipe-photo" style="background:' + photoGrads[r.g] + ';">' + r.e + '</div>' +
+      '<div class="recipe-body">' +
+        '<div class="n">' + r.n + '</div>' +
+        '<div class="meta">' + r.desc + '</div>' +
+        '<div class="meta">Энергия: ' + r.energy + '</div>' +
+        '<div class="row"><span class="profit">+' + r.profit + ' ₽</span>' +
+          '<button class="btn-cook" onclick="startMinigame(\'' + r.id + '\')" ' + (state.energy < r.energy ? 'disabled' : '') + '>Готовить</button>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  }
+  grid.innerHTML = html;
+}
+function renderRecipes() {
+  var grid = document.getElementById('recipesGrid');
+  if (!grid) return;
+  var html = '';
+  for (var i = 0; i < RECIPES.length; i++) {
+    var r = RECIPES[i];
+    var owned = state.owned[r.id];
+    html += '<div class="recipe-card ' + (owned ? '' : 'locked') + '">' +
+      '<div class="recipe-photo" style="background:' + photoGrads[r.g] + ';">' + r.e + '</div>' +
+      '<div class="recipe-body">' +
+        '<div class="n">' + r.n + '</div>' +
+        '<div class="meta">' + r.desc + '</div>' +
+        '<div class="meta">Прибыль: +' + r.profit + ' ₽ · Энергия: ' + r.energy + '</div>' +
+        '<div class="row">' +
+          (owned
+            ? '<span class="profit" style="color:#1e8a3c;">✓ Куплен</span>'
+            : '<span class="profit">' + r.buy + ' ₽</span><button class="btn-unlock" onclick="buyRecipe(\'' + r.id + '\')">Купить</button>') +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  }
+  grid.innerHTML = html;
+}
+function buyRecipe(id) {
+  var r = null;
+  for (var i = 0; i < RECIPES.length; i++) if (RECIPES[i].id === id) r = RECIPES[i];
+  if (!r || state.owned[id]) return;
+  if (state.cash < r.buy) { toast('Не хватает денег на рецепт', 'bad'); return; }
+  state.cash -= r.buy;
+  state.owned[id] = true;
+  if (state.cash > state.bestCash) state.bestCash = state.cash;
+  updateHUD(); save(); renderRecipes(); renderCook();
+  toast('Рецепт «' + r.n + '» куплен!', 'good');
+}
+function renderShop() {
+  var grid = document.getElementById('shopGrid');
+  if (!grid) return;
+  var html = '';
+  for (var i = 0; i < SHOP_ITEMS.length; i++) {
+    var it = SHOP_ITEMS[i];
+    var owned = state.ownedShop[it.id];
+    html += '<div class="shop-card ' + (owned ? 'owned' : '') + '">' +
+      '<div class="ico">' + it.e + '</div>' +
+      '<div class="n">' + it.n + '</div>' +
+      '<div class="d">' + it.desc + '</div>' +
+      '<div class="pr">' + fmt(it.price) + ' ₽</div>' +
+      (owned ? '<div class="owned-tag">✓ Куплено</div>'
+        : '<button class="btn-buy" onclick="buyShop(\'' + it.id + '\')" ' + (state.cash < it.price ? 'disabled' : '') + '>Купить</button>') +
+    '</div>';
+  }
+  grid.innerHTML = html;
+  renderGoals();
+}
+function buyShop(id) {
+  var it = null;
+  for (var i = 0; i < SHOP_ITEMS.length; i++) if (SHOP_ITEMS[i].id === id) it = SHOP_ITEMS[i];
+  if (!it || state.ownedShop[id]) return;
+  if (state.cash < it.price) { toast('Не хватает денег', 'bad'); return; }
+  state.cash -= it.price;
+  state.ownedShop[id] = true;
+  if (state.cash > state.bestCash) state.bestCash = state.cash;
+  updateHUD(); save(); renderShop();
+  toast('Покупка: ' + it.n + '! 🎉', 'good');
+}
+function renderGoals() {
+  var el = document.getElementById('goalsPanel');
+  if (!el) return;
+  var html = '<h3>🎯 Твои цели</h3>';
+  for (var i = 0; i < SHOP_ITEMS.length; i++) {
+    var it = SHOP_ITEMS[i];
+    html += '<div class="goal-row"><span class="ico">' + it.e + '</span><span class="n">' + it.n + '</span>' +
+      (state.ownedShop[it.id] ? '<span class="done">✓ Готово</span>' : '<span class="notyet">' + fmt(it.price) + ' ₽</span>') +
+    '</div>';
+  }
+  var count = 0;
+  for (var k in state.ownedShop) if (state.ownedShop.hasOwnProperty(k)) count++;
+  html += '<p style="font-size:13px; color:#8a97a5; margin-top:10px;">Куплено: <b>' + count + ' из ' + SHOP_ITEMS.length + '</b></p>';
+  el.innerHTML = html;
+}
+function renderCredit() {
+  var box = document.getElementById('creditBox');
+  if (!box) return;
+  if (state.debt <= 0) {
+    var actions = '';
+    for (var i = 0; i < CREDIT_OPTIONS.length; i++) {
+      actions += '<button class="btn-yellow" onclick="takeNewCredit(' + i + ')">' + CREDIT_OPTIONS[i].label + '</button>';
+    }
+    box.innerHTML = '<h3>🏦 Кредит закрыт!</h3>' +
+      '<div class="paid-off">Ты полностью погасил кредит. Теперь вся прибыль — твоя! 🎉</div>' +
+      '<p style="margin-top:14px;">Хочешь взять новый кредит на развитие?</p>' +
+      '<div class="actions">' + actions + '</div>' +
+      '<div class="warn">Каждый новый кредит увеличивает долг. Плати вовремя — иначе штраф.</div>';
+    return;
+  }
+  var left = state.debtDue - Date.now();
+  var mins = Math.max(0, Math.ceil(left / 60000));
+  box.innerHTML = '<h3>🏦 Кредит на старт</h3>' +
+    '<p>Ты взял <b>' + fmt(state.debtBase) + ' ₽</b>. Осталось вернуть:</p>' +
+    '<div class="big">' + fmt(state.debt) + ' ₽</div>' +
+    '<p>До следующего платежа: <b>' + (left > 0 ? mins + ' мин' : 'просрочено!') + '</b></p>' +
+    '<div class="actions">' +
+      '<button class="btn-primary" onclick="payDebt(500)">Внести 500 ₽</button>' +
+      '<button class="btn-primary" onclick="payDebt(1000)">Внести 1000 ₽</button>' +
+      '<button class="btn-yellow" onclick="payDebt(state.debt)">Погасить весь (' + fmt(state.debt) + ' ₽)</button>' +
+    '</div>' +
+    '<div class="warn">⚠️ Просрочка больше 2 минут = штраф 10% от остатка.</div>';
+}
+function payDebt(amount) {
+  if (state.debt <= 0) return;
+  var pay = Math.min(amount, state.debt);
+  if (state.cash < pay) { toast('Не хватает денег на платёж', 'bad'); return; }
+  state.cash -= pay;
+  state.debt -= pay;
+  if (state.debt <= 0) { state.debt = 0; toast('🎉 Кредит полностью погашен!', 'good'); }
+  else { toast('Платёж ' + fmt(pay) + ' ₽. Остаток: ' + fmt(state.debt) + ' ₽', 'good'); state.debtDue = Date.now() + STEP_DEBT_MS; }
+  updateHUD(); save(); renderCredit();
+}
+function takeNewCredit(idx) {
+  var opt = CREDIT_OPTIONS[idx];
+  if (!opt) return;
+  state.cash += opt.amount;
+  state.debt += opt.amount;
+  state.debtBase += opt.amount;
+  state.debtDue = Date.now() + STEP_DEBT_MS;
+  if (state.cash > state.bestCash) state.bestCash = state.cash;
+  updateHUD(); save(); renderCredit();
+  toast('🏦 Новый кредит: +' + fmt(opt.amount) + ' ₽. Долг: ' + fmt(state.debt) + ' ₽', 'good');
+}
+function checkDebtDeadline() {
+  if (state.debt > 0 && Date.now() > state.debtDue + 2 * 60 * 1000) {
+    var fine = Math.round(state.debt * 0.1);
+    state.debt += fine;
+    state.debtDue = Date.now() + STEP_DEBT_MS;
+    toast('Штраф банка: +' + fmt(fine) + ' ₽ к долгу', 'bad');
+    updateHUD(); save(); renderCredit();
+  }
+}
+setInterval(checkDebtDeadline, 15000);
+setInterval(updateHUD, 5000);
+
+function getLeaders() {
+  try { return JSON.parse(localStorage.getItem('vkusno_leaders') || '[]'); }
+  catch(e) { return []; }
+}
+function saveLeaders(arr) { try { localStorage.setItem('vkusno_leaders', JSON.stringify(arr)); } catch(e) {} }
+function saveLeaderName() {
+  var inp = document.getElementById('lbName');
+  var name = (inp.value || '').trim();
+  if (!name) { toast('Введи имя', 'bad'); return; }
+  state.playerName = name;
+  save(); updateLeaderEntry(); renderLeaders();
+  toast('Имя сохранено!', 'good');
+}
+function updateLeaderEntry() {
+  if (!state.registered) return;
+  var arr = getLeaders();
+  var existing = null;
+  for (var i = 0; i < arr.length; i++) if (arr[i].name === state.playerName) existing = arr[i];
+  if (existing) existing.score = Math.max(existing.score, state.bestCash);
+  else arr.push({ name: state.playerName, score: state.bestCash });
+  arr.sort(function(a, b){ return b.score - a.score; });
+  saveLeaders(arr.slice(0, 20));
+}
+function renderLeaders() {
+  updateLeaderEntry();
+  var list = document.getElementById('lbList');
+  var inp = document.getElementById('lbName');
+  if (inp && !inp.value) inp.value = state.playerName;
+  if (!list) return;
+  var arr = getLeaders();
+  if (arr.length === 0) { list.innerHTML = '<p style="color:#8a97a5;">Пока никого нет. Поиграй — и попади в таблицу!</p>'; return; }
+  var html = '';
+  for (var i = 0; i < arr.length; i++) {
+    var x = arr[i];
+    var me = x.name === state.playerName;
+    var placeClass = i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : '';
+    html += '<div class="lb-row ' + (me ? 'me' : '') + '">' +
+      '<span class="place ' + placeClass + '">' + (i + 1) + '</span>' +
+      '<span class="who">' + x.name + (me ? ' (ты)' : '') + '</span>' +
+      '<span class="score">' + fmt(x.score) + ' ₽</span>' +
+    '</div>';
+  }
+  list.innerHTML = html;
+}
+
+/* ============================================================
+   ЧАСТЬ 7. МИНИ-ИГРЫ (усложнённые)
+   ============================================================ */
+var currentMinigame = null;
+function closeMinigameModal() {
+  var m = document.getElementById('minigameOverlay');
+  if (m) m.remove();
+  currentMinigame = null;
+}
+function startMinigame(recipeId) {
+  var r = null;
+  for (var i = 0; i < RECIPES.length; i++) if (RECIPES[i].id === recipeId) r = RECIPES[i];
+  if (!r || !state.owned[r.id]) return;
+  if (state.energy < r.energy) { toast('Не хватает энергии', 'bad'); return; }
+  if (state.cash < r.cost) { toast('Не хватает денег на продукты', 'bad'); return; }
+  if (currentMinigame) closeMinigameModal();
+  var overlay = document.createElement('div');
+  overlay.className = 'overlay show'; overlay.id = 'minigameOverlay';
+  overlay.innerHTML = '<div class="modal" id="minigameModalBody"></div>';
+  document.body.appendChild(overlay);
+  overlay.addEventListener('click', function(e){ if (e.target === overlay) closeMinigameModal(); });
+  var body = document.getElementById('minigameModalBody');
+  if (r.type === 'burger') startBurgerGame(body, r);
+  else if (r.type === 'fryer') startFryerGame(body, r);
+  else startDrinkGame(body, r);
+}
+function finishMinigame(r, success, quality) {
+  if (success) {
+    var bonus = Math.round(r.profit * quality);
+    state.energy -= r.energy;
+    state.cash += bonus;
+    if (state.cash > state.bestCash) state.bestCash = state.cash;
+    updateHUD(); save();
+    toast('Успех! +' + fmt(bonus) + ' ₽', 'good');
+    maybeRandomEvent();
+    if (Math.random() < 0.3) managerSpeak(false);
+  } else {
+    state.energy -= Math.ceil(r.energy / 2);
+    updateHUD(); save();
+    toast('Неудача — блюдо испорчено.', 'bad');
+    managerSpeak(true);
+  }
+  closeMinigameModal();
+  renderCook();
+  renderLeaders();
+}
+function startBurgerGame(body, r) {
+  var sequences = [
+    ['🍞','🥩','🧀','🥬','🍞'],
+    ['🍞','🥩','🧀','🥩','🧀','🍞'],
+    ['🍞','🥩','🧀','🥬','🍅','🥩','🍞'],
+    ['🍞','🥩','🧀','🥬','🍅','🥒','🧀','🍞']
+  ];
+  var seq = sequences[Math.min(sequences.length - 1, Math.floor(Math.random() * sequences.length))];
+  var pool = seq.concat(seq).concat(seq.slice(1, -1));
+  var stage = document.createElement('div');
+  stage.className = 'burger-stage';
+  body.innerHTML = '<div class="minigame">' +
+    '<h3>🍔 Сборка бургера: ' + r.n + '</h3>' +
+    '<p>Нажимай на падающие ингредиенты <b>в правильном порядке</b>. Ошибка — бургер испорчен.</p>' +
+    '<div class="recipe-sequence">Порядок: ' + seq.map(function(e){ return '<b>' + e + '</b>'; }).join(' → ') + '</div>' +
+    '<div class="burger-stack" id="burgerStack"></div>' +
+    '<div id="burgerStageWrap"></div>' +
+  '</div>';
+  document.getElementById('burgerStageWrap').appendChild(stage);
+  var step = 0, mistakes = 0, active = true;
+  var stack = document.getElementById('burgerStack');
+  var speedBase = 1900 - Math.min(900, state.bestCash / 500);
+  var spawnDelay = 750;
+  function spawn() {
+    if (!active) return;
+    var el = document.createElement('div');
+    el.className = 'falling-ing';
+    var ing = pool[Math.floor(Math.random() * pool.length)];
+    el.textContent = ing;
+    el.style.left = (10 + Math.random() * (stage.clientWidth - 60)) + 'px';
+    el.style.top = '-50px';
+    el._ing = ing;
+    el.addEventListener('click', function() {
+      if (!active) return;
+      if (el._ing === seq[step]) {
+        step++;
+        stack.insertAdjacentHTML('beforeend', '<span>' + el._ing + '</span>');
+        el.remove();
+        if (step >= seq.length) {
+          active = false;
+          var quality = mistakes === 0 ? 1 : mistakes === 1 ? 0.7 : 0.4;
+          finishMinigame(r, true, quality);
+        }
+      } else {
+        mistakes++;
+        el.style.background = '#c0392b';
+        el.textContent = '✕';
+        setTimeout(function(){ el.remove(); }, 300);
+        if (mistakes >= 3) { active = false; finishMinigame(r, false, 0); }
+      }
+    });
+    stage.appendChild(el);
+    var start = performance.now();
+    var dur = speedBase + Math.random() * 400;
+    function fall(now) {
+      if (!active || !el.parentNode) return;
+      var t = Math.min(1, (now - start) / dur);
+      el.style.top = (-50 + t * (stage.clientHeight + 50)) + 'px';
+      if (t < 1) requestAnimationFrame(fall);
+      else el.remove();
+    }
+    requestAnimationFrame(fall);
+    setTimeout(spawn, spawnDelay);
+  }
+  spawn();
+}
+
+/* Фритюр — усложнён: два этапа (обжарка и встряхивание) */
+function startFryerGame(body, r) {
+  body.innerHTML = '<div class="minigame fryer-wrap">' +
+    '<h3>🍟 Фритюр: ' + r.n + '</h3>' +
+    '<p>Два этапа: сначала <b>обжарка</b>, потом <b>встряхивание</b>. На каждом — попади в зелёную зону.</p>' +
+    '<div class="fryer-step-indicator" id="fryerStepInd">Этап 1 из 2: обжарка</div>' +
+    '<div class="fryer-pot" id="fryerPot">🥔</div>' +
+    '<div class="fryer-timer"><div class="zone" id="fryerZone"></div><div class="fill" id="fryerFill"></div></div>' +
+    '<div class="fryer-hint" id="fryerHint">Готов к погружению</div>' +
+    '<button class="btn-primary" style="margin-top:14px;" id="fryerBtn">Опустить во фритюр</button>' +
+  '</div>';
+  var fill = document.getElementById('fryerFill');
+  var zone = document.getElementById('fryerZone');
+  var btn = document.getElementById('fryerBtn');
+  var hint = document.getElementById('fryerHint');
+  var pot = document.getElementById('fryerPot');
+  var stepInd = document.getElementById('fryerStepInd');
+  var stage = 1, mistakes = 0, cooking = false, t0 = 0, rafId = null;
+  var targetStart, targetEnd, totalMs;
+  function setStage(s) {
+    stage = s;
+    if (s === 1) {
+      stepInd.textContent = 'Этап 1 из 2: обжарка';
+      targetStart = 30 + Math.random() * 20;
+      targetEnd = targetStart + 15 + Math.random() * 8;
+      totalMs = 4500;
+    } else {
+      stepInd.textContent = 'Этап 2 из 2: встряхивание';
+      targetStart = 40 + Math.random() * 20;
+      targetEnd = targetStart + 12 + Math.random() * 6;
+      totalMs = 3500;
+    }
+    zone.style.left = targetStart + '%';
+    zone.style.width = (targetEnd - targetStart) + '%';
+    fill.style.width = '0%';
+    cooking = false;
+    pot.textContent = '🥔';
+    btn.textContent = s === 1 ? 'Опустить во фритюр' : 'Встряхнуть!';
+    btn.style.background = '#1e3b2f';
+    hint.textContent = s === 1 ? 'Готов к погружению' : 'Готов к встряхиванию';
+  }
+  setStage(1);
+  btn.addEventListener('click', function() {
+    if (!cooking) {
+      cooking = true; t0 = performance.now();
+      pot.textContent = '🍟';
+      hint.textContent = 'Жарится… жми в зелёной зоне!';
+      btn.textContent = 'СТОП';
+      btn.style.background = '#e8542f';
+      function tick(now) {
+        var t = Math.min(1, (now - t0) / totalMs);
+        fill.style.width = (t * 100) + '%';
+        if (t < 1 && cooking) rafId = requestAnimationFrame(tick);
+        else if (cooking) { cooking = false; failFryer(); }
+      }
+      rafId = requestAnimationFrame(tick);
+    } else {
+      cooking = false;
+      if (rafId) cancelAnimationFrame(rafId);
+      var pct = parseFloat(fill.style.width);
+      var ok = pct >= targetStart && pct <= targetEnd;
+      if (ok) {
+        if (stage === 1) {
+          toast('Обжарка ок! Теперь встряхни.', 'good');
+          setStage(2);
+        } else {
+          var center = (targetStart + targetEnd) / 2;
+          var dist = Math.abs(pct - center) / ((targetEnd - targetStart) / 2);
+          finishMinigame(r, true, 1 - dist * 0.5);
+        }
+      } else {
+        mistakes++;
+        if (mistakes >= 2) { failFryer(); }
+        else { toast('Мимо! Попробуй ещё раз.', 'bad'); setStage(stage); }
+      }
+    }
+  });
+  function failFryer() {
+    pot.textContent = '🔥';
+    finishMinigame(r, false, 0);
+  }
+}
+
+/* Напиток — усложнён: нужно налить до уровня и не перелить, плюс пена */
+function startDrinkGame(body, r) {
+  body.innerHTML = '<div class="minigame drink-wrap">' +
+    '<h3>🥤 Напиток: ' + r.n + '</h3>' +
+    '<p>Налей до зелёного уровня и <b>не перелей</b>. Если нальёшь слишком быстро — пойдёт пена.</p>' +
+    '<div class="drink-step" id="drinkStep">Цель: попади в зелёную зону</div>' +
+    '<div class="drink-glass">' +
+      '<div class="drink-fill" id="drinkFill"></div>' +
+      '<div class="drink-foam" id="drinkFoam"></div>' +
+      '<div class="drink-target" id="drinkTarget"></div>' +
+    '</div>' +
+    '<div class="fryer-hint" id="drinkHint">Готов к наливу</div>' +
+    '<button class="btn-primary" style="margin-top:14px;" id="drinkBtn">Налить</button>' +
+  '</div>';
+  var fill = document.getElementById('drinkFill');
+  var foam = document.getElementById('drinkFoam');
+  var target = document.getElementById('drinkTarget');
+  var btn = document.getElementById('drinkBtn');
+  var hint = document.getElementById('drinkHint');
+  var stepEl = document.getElementById('drinkStep');
+  var tStart = 45 + Math.random() * 20;
+  var tEnd = tStart + 10 + Math.random() * 8;
+  target.style.bottom = tStart + '%';
+  target.style.height = (tEnd - tStart) + '%';
+  var pouring = false, t0 = 0, rafId = null;
+  var totalMs = 3500;
+  var speed = 1.4 + Math.random() * 0.4; // усложнение: скорость налива
+  btn.addEventListener('click', function() {
+    if (!pouring) {
+      pouring = true; t0 = performance.now();
+      hint.textContent = 'Льётся… жми «Стоп» в зелёной зоне!';
+      btn.textContent = 'Стоп';
+      btn.style.background = '#e8542f';
+      function tick(now) {
+        var t = Math.min(1, (now - t0) / totalMs);
+        var h = t * 100 * speed;
+        if (h > 100) h = 100;
+        fill.style.height = h + '%';
+        if (h > tEnd) foam.style.height = Math.min(20, (h - tEnd) * 2) + '%';
+        if (t < 1 && pouring) rafId = requestAnimationFrame(tick);
+        else if (pouring) { pouring = false; finishDrink(); }
+      }
+      rafId = requestAnimationFrame(tick);
+    } else {
+      pouring = false;
+      if (rafId) cancelAnimationFrame(rafId);
+      finishDrink();
+    }
+  });
+  function finishDrink() {
+    var pct = parseFloat(fill.style.height);
+    var ok = pct >= tStart && pct <= tEnd;
+    if (ok) {
+      var center = (tStart + tEnd) / 2;
+      var dist = Math.abs(pct - center) / ((tEnd - tStart) / 2);
+      finishMinigame(r, true, 1 - dist * 0.4);
+    } else {
+      finishMinigame(r, false, 0);
+    }
+  }
+}
+
+function maybeRandomEvent() {
+  if (Math.random() > 0.25) return;
+  var events = [
+    { t: '💰 Щедрый клиент', d: 'Оставил чаевые: +300 ₽', fn: function(){ state.cash += 300; } },
+    { t: '🧾 Налоговая проверка', d: 'Штраф: −200 ₽', fn: function(){ state.cash = Math.max(0, state.cash - 200); } },
+    { t: '📦 Поставщик подвёл', d: 'Потратился на продукты: −100 ₽', fn: function(){ state.cash = Math.max(0, state.cash - 100); } },
+    { t: '⭐ Отзыв в соцсетях', d: 'Бонус: +500 ₽', fn: function(){ state.cash += 500; } }
+  ];
+  var ev = events[Math.floor(Math.random() * events.length)];
+  ev.fn();
+  updateHUD(); save();
+  var popup = document.getElementById('eventPopup');
+  document.getElementById('eventTitle').textContent = ev.t;
+  document.getElementById('eventDesc').textContent = ev.d;
+  popup.classList.add('show');
+}
+function closeEvent() { document.getElementById('eventPopup').classList.remove('show'); }
+
+/* ============================================================
+   ЧАСТЬ 8. МЕНЕДЖЕР
+   ============================================================ */
+var MANAGER_LINES = [
+  'Ты бездарь, работай лучше!',
+  'Это не бургер, это позор кухни!',
+  'Я архитектор, а ты — так, мимо проходил.',
+  'Мой кот готовит лучше.',
+  'Ты вообще видел, как надо собирать бургер?',
+  'С такой скоростью ты и кредит не отдашь.',
+  'Я в шоке. И это твой лучший результат?',
+  'Работай лучше — я тебе не нянька.',
+  'Бездарность — это твой диагноз.',
+  'Даже стажёр справился бы быстрее.',
+  'Ты — лицо компании. И это лицо мне не нравится.',
+  'Я тут архитектор, а не твой личный мотиватор.',
+  'Если бы я платил за талант, ты был бы мне должен.',
+  'Может, тебе пойти в казино? Там хотя бы шанс есть.',
+  'Хватит портить продукты. Работай лучше!'
+];
+var managerTimer = null;
+function showManager() {
+  var w = document.getElementById('managerWidget');
+  if (!w) return;
+  w.classList.remove('hidden');
+  scheduleManagerLine();
+}
+function dismissManager() {
+  var w = document.getElementById('managerWidget');
+  if (!w) return;
+  w.classList.add('hidden');
+  clearTimeout(managerTimer);
+  setTimeout(function() {
+    if (!state.registered) return;
+    w.classList.remove('hidden');
+    managerSpeak(false, 'Я вернулся, бездарь. Работай!');
+  }, 12000);
+}
+function scheduleManagerLine() {
+  clearTimeout(managerTimer);
+  managerTimer = setTimeout(function() {
+    var w = document.getElementById('managerWidget');
+    if (w && !w.classList.contains('hidden')) {
+      managerSpeak(false);
+      scheduleManagerLine();
+    }
+  }, 15000 + Math.random() * 10000);
+}
+function managerSpeak(force, custom) {
+  var bubble = document.getElementById('managerBubble');
+  if (!bubble) return;
+  var line = custom || MANAGER_LINES[Math.floor(Math.random() * MANAGER_LINES.length)];
+  bubble.textContent = '🧑‍💼 ' + line;
+  bubble.classList.add('show');
+  clearTimeout(bubble._h);
+  bubble._h = setTimeout(function(){ bubble.classList.remove('show'); }, 5000);
+}
+function callManager() {
+  showManager();
+  managerSpeak(true);
+}
+
+/* ============================================================
+   ЧАСТЬ 9. СЕКРЕТНЫЙ КОНТРАКТ
+   ============================================================ */
+function openSecret() {
+  var ov = document.getElementById('secretOverlay');
+  var nameEl = document.getElementById('contractName');
+  if (nameEl) nameEl.textContent = state.playerName || 'игрок';
+  var inp = document.getElementById('contractSign');
+  if (inp) inp.value = state.playerName === 'Игрок' ? '' : state.playerName;
+  ov.classList.add('show');
+}
+function closeSecret() {
+  document.getElementById('secretOverlay').classList.remove('show');
+}
+function signContract() {
+  var inp = document.getElementById('contractSign');
+  var name = (inp.value || '').trim();
+  if (!name) { alert('Введи имя для подписи'); return; }
+  state.playerName = name;
+  state.contractSigned = true;
+  state.registered = true;
+  save();
+  updateHUD();
+  document.getElementById('secretOverlay').classList.remove('show');
+  toast('📜 Контракт подписан! Открыты вкладки «Стройка» и «Бой».', 'good');
+  managerSpeak(false, 'Ну наконец-то, бездарь. Теперь работай!');
+}
+
+/* ============================================================
+   ЧАСТЬ 10. СТРОЙКА
+   ============================================================ */
+function openBuildTab() {
+  gameTab('build', document.getElementById('gtab-build'));
+}
+function renderBuild() {
+  var grid = document.getElementById('buildGrid');
+  if (!grid) return;
+  var doneCount = 0;
+  for (var k in state.buildProgress) if (state.buildProgress[k]) doneCount++;
+  var pct = Math.round(doneCount / BUILD_STAGES.length * 100);
+  var bar = document.getElementById('buildProgressBar');
+  if (bar) bar.style.width = pct + '%';
+  var txt = document.getElementById('buildProgressText');
+  if (txt) txt.textContent = pct + '%';
+  var html = '';
+  for (var i = 0; i < BUILD_STAGES.length; i++) {
+    var s = BUILD_STAGES[i];
+    var done = state.buildProgress[s.id];
+    var canBuy = !done && state.cash >= s.price;
+    html += '<div class="build-card ' + (done ? 'done' : '') + '">' +
+      '<div class="ico">' + s.e + '</div>' +
+      '<div class="n">' + s.n + '</div>' +
+      '<div class="d">' + s.desc + '</div>' +
+      '<div class="pr">' + fmt(s.price) + ' ₽</div>' +
+      (done ? '<div class="owned-tag">✓ Готово</div>'
+        : '<button class="btn-build" onclick="buildStage(\'' + s.id + '\')" ' + (canBuy ? '' : 'disabled') + '>Построить</button>') +
+    '</div>';
+  }
+  grid.innerHTML = html;
+}
+function buildStage(id) {
+  var s = null;
+  for (var i = 0; i < BUILD_STAGES.length; i++) if (BUILD_STAGES[i].id === id) s = BUILD_STAGES[i];
+  if (!s || state.buildProgress[id]) return;
+  if (state.cash < s.price) { toast('Не хватает денег на этап', 'bad'); return; }
+  state.cash -= s.price;
+  state.buildProgress[id] = true;
+  if (state.cash > state.bestCash) state.bestCash = state.cash;
+  updateHUD(); save(); renderBuild();
+  toast('🏗️ Этап «' + s.n + '» готов!', 'good');
+  var doneCount = 0;
+  for (var k in state.buildProgress) if (state.buildProgress[k]) doneCount++;
+  if (doneCount === BUILD_STAGES.length) {
+    toast('🎉 Ресторан построен! Теперь ты — владелец «Вкусно и почка»!', 'good');
+    state.cash += 20000;
+    save(); updateHUD();
+  }
+}
+
+/* ============================================================
+   ЧАСТЬ 11. КАЗИНО
+   ============================================================ */
+function openCasino() {
+  document.getElementById('vkst').classList.remove('show');
+  document.getElementById('gameScreen').style.display = 'none';
+  document.getElementById('casinoScreen').style.display = 'block';
+  document.getElementById('dnevnik').style.display = 'none';
+  document.title = 'Казино — Вкусно и почка';
+  updateHUD();
+  renderWheel();
+  renderCasinoHistory();
+  window.scrollTo(0, 0);
+}
+function casinoTab(id, el) {
+  document.querySelectorAll('.casino-panel').forEach(function(p){ p.classList.remove('active'); });
+  document.querySelectorAll('.casino-tab').forEach(function(t){ t.classList.remove('active'); });
+  var panel = document.getElementById('cpanel-' + id); if (panel) panel.classList.add('active');
+  if (el) el.classList.add('active');
+}
+var WHEEL_SEGMENTS = [
+  { mult: 0,   color: '#c0392b', label: 'x0' },
+  { mult: 1,   color: '#8a97a5', label: 'x1' },
+  { mult: 1.5, color: '#2a4d9b', label: 'x1.5' },
+  { mult: 0,   color: '#c0392b', label: 'x0' },
+  { mult: 2,   color: '#1e8a3c', label: 'x2' },
+  { mult: 1,   color: '#8a97a5', label: 'x1' },
+  { mult: 0,   color: '#c0392b', label: 'x0' },
+  { mult: 3,   color: '#d4a017', label: 'x3' },
+  { mult: 1.5, color: '#2a4d9b', label: 'x1.5' },
+  { mult: 0,   color: '#c0392b', label: 'x0' },
+  { mult: 5,   color: '#e8542f', label: 'x5' },
+  { mult: 1,   color: '#8a97a5', label: 'x1' }
+];
+var wheelRotation = 0;
+var wheelSpinning = false;
+function renderWheel() {
+  var svg = document.getElementById('wheelSvg');
+  if (!svg) return;
+  var n = WHEEL_SEGMENTS.length;
+  var angle = 360 / n;
+  var paths = '';
+  for (var i = 0; i < n; i++) {
+    var start = i * angle;
+    var end = start + angle;
+    var a1 = (start - 90) * Math.PI / 180;
+    var a2 = (end - 90) * Math.PI / 180;
+    var r = 100;
+    var x1 = 100 + r * Math.cos(a1);
+    var y1 = 100 + r * Math.sin(a1);
+    var x2 = 100 + r * Math.cos(a2);
+    var y2 = 100 + r * Math.sin(a2);
+    var large = angle > 180 ? 1 : 0;
+    var seg = WHEEL_SEGMENTS[i];
+    paths += '<path d="M100,100 L' + x1.toFixed(2) + ',' + y1.toFixed(2) + ' A' + r + ',' + r + ' 0 ' + large + ' 1 ' + x2.toFixed(2) + ',' + y2.toFixed(2) + ' Z" fill="' + seg.color + '" stroke="#fff" stroke-width="1"/>';
+    var mid = (start + end) / 2 - 90;
+    var tx = 100 + 68 * Math.cos(mid * Math.PI / 180);
+    var ty = 100 + 68 * Math.sin(mid * Math.PI / 180);
+    paths += '<text x="' + tx.toFixed(2) + '" y="' + ty.toFixed(2) + '" font-size="11" font-weight="800" fill="#fff" text-anchor="middle" dominant-baseline="middle">' + seg.label + '</text>';
+  }
+  svg.innerHTML = paths;
+  svg.style.transform = 'rotate(' + wheelRotation + 'deg)';
+}
+function spinWheel() {
+  if (wheelSpinning) return;
+  var betInput = document.getElementById('wheelBet');
+  var bet = Math.floor(+betInput.value);
+  if (!bet || bet < 10) { toast('Ставка минимум 10 ₽', 'bad'); return; }
+  if (bet > state.cash) { toast('Не хватает денег на ставку', 'bad'); return; }
+  wheelSpinning = true;
+  document.getElementById('wheelSpinBtn').disabled = true;
+  state.cash -= bet;
+  updateHUD(); save();
+  var n = WHEEL_SEGMENTS.length;
+  var segAngle = 360 / n;
+  var idx = Math.floor(Math.random() * n);
+  var targetRotation = 360 * 6 + (360 - idx * segAngle - segAngle / 2);
+  wheelRotation += targetRotation;
+  var svg = document.getElementById('wheelSvg');
+  svg.style.transition = 'transform 4s cubic-bezier(.17,.67,.3,1)';
+  svg.style.transform = 'rotate(' + wheelRotation + 'deg)';
+  setTimeout(function() {
+    var seg = WHEEL_SEGMENTS[idx];
+    var win = 0;
+    var text = '';
+    if (seg.mult === 0) { text = 'Проигрыш −' + fmt(bet) + ' ₽'; addCasinoHistory('Колесо', -bet); }
+    else {
+      win = Math.round(bet * seg.mult);
+      var profit = win - bet;
+      state.cash += win;
+      if (state.cash > state.bestCash) state.bestCash = state.cash;
+      if (profit >= 0) text = 'Выигрыш +' + fmt(win) + ' ₽ (x' + seg.mult + ')';
+      else text = 'Возврат ' + fmt(win) + ' ₽ (x' + seg.mult + ')';
+      addCasinoHistory('Колесо', profit);
+    }
+    updateHUD(); save();
+    toast(text, seg.mult === 0 ? 'bad' : 'good');
+    document.getElementById('wheelSpinBtn').disabled = false;
+    wheelSpinning = false;
+    if (seg.mult === 0 && Math.random() < 0.5) managerSpeak(false, 'Проиграл? Я же говорил — работай лучше!');
+  }, 4100);
+}
+var SLOT_SYMBOLS = ['🍒','🍋','🍊','💎','7️⃣'];
+var SLOT_MULT = { '🍒': 3, '🍋': 4, '🍊': 5, '💎': 10, '7️⃣': 20 };
+var slotsSpinning = false;
+function spinSlots() {
+  if (slotsSpinning) return;
+  var bet = Math.floor(+document.getElementById('slotsBet').value);
+  if (!bet || bet < 10) { toast('Ставка минимум 10 ₽', 'bad'); return; }
+  if (bet > state.cash) { toast('Не хватает денег на ставку', 'bad'); return; }
+  slotsSpinning = true;
+  document.getElementById('slotsSpinBtn').disabled = true;
+  document.getElementById('slotsResult').textContent = '';
+  state.cash -= bet;
+  updateHUD(); save();
+  var reels = [0,1,2].map(function(i){ return document.getElementById('reel' + i); });
+  reels.forEach(function(r){ r.classList.add('spinning'); });
+  var spinIntervals = reels.map(function(r) {
+    return setInterval(function() {
+      r.textContent = SLOT_SYMBOLS[Math.floor(Math.random() * SLOT_SYMBOLS.length)];
+    }, 80);
+  });
+  setTimeout(function() {
+    var result = [0,1,2].map(function(){ return SLOT_SYMBOLS[Math.floor(Math.random() * SLOT_SYMBOLS.length)]; });
+    reels.forEach(function(r, i) {
+      clearInterval(spinIntervals[i]);
+      r.classList.remove('spinning');
+      r.textContent = result[i];
+    });
+    var win = 0, profit = 0, text = '';
+    if (result[0] === result[1] && result[1] === result[2]) {
+      var mult = SLOT_MULT[result[0]] || 3;
+      win = bet * mult;
+      profit = win - bet;
+      state.cash += win;
+      text = '🎉 Три ' + result[0] + '! Выигрыш ' + fmt(win) + ' ₽ (x' + mult + ')';
+      toast(text, 'good');
+    } else if (result[0] === result[1] || result[1] === result[2] || result[0] === result[2]) {
+      win = Math.round(bet * 1.5);
+      profit = win - bet;
+      state.cash += win;
+      text = 'Пара! Возврат ' + fmt(win) + ' ₽ (x1.5)';
+      toast(text, 'good');
+    } else {
+      text = 'Проигрыш −' + fmt(bet) + ' ₽';
+      toast(text, 'bad');
+      if (Math.random() < 0.5) managerSpeak(false, 'Опять проиграл? Бездарь!');
+    }
+    if (state.cash > state.bestCash) state.bestCash = state.cash;
+    addCasinoHistory('Слоты', profit);
+    document.getElementById('slotsResult').textContent = text;
+    updateHUD(); save();
+    document.getElementById('slotsSpinBtn').disabled = false;
+    slotsSpinning = false;
+  }, 2000);
+}
+function addCasinoHistory(game, profit) {
+  state.casinoHistory.unshift({ game: game, profit: profit, time: new Date().toLocaleTimeString('ru-RU', {hour:'2-digit',minute:'2-digit'}) });
+  state.casinoHistory = state.casinoHistory.slice(0, 20);
+  save();
+  renderCasinoHistory();
+}
+function renderCasinoHistory() {
+  var el = document.getElementById('casinoHistory');
+  if (!el) return;
+  if (state.casinoHistory.length === 0) {
+    el.innerHTML = '<p class="ch-empty">Пока пусто. Сделай первую ставку!</p>';
+    return;
+  }
+  var html = '';
+  for (var i = 0; i < state.casinoHistory.length; i++) {
+    var h = state.casinoHistory[i];
+    html += '<div class="ch-row"><span>' + h.game + ' · ' + h.time + '</span>' +
+      '<span class="' + (h.profit >= 0 ? 'ch-win' : 'ch-lose') + '">' + (h.profit >= 0 ? '+' : '') + fmt(h.profit) + ' ₽</span></div>';
+  }
+  el.innerHTML = html;
+}
+
+/* ============================================================
+   ЧАСТЬ 12. НОВЫЙ 3D БОЙ (DOOM RAYCASTING)
+   ============================================================ */
+var doomCanvas, doomCtx, doomAnim;
+var doomState = {
+  running: false, hp: 100, ammo: 50, kills: 0,
+  map: [
+    [1,1,1,1,1,1,1,1],
+    [1,0,0,0,0,0,0,1],
+    [1,0,0,1,0,0,0,1],
+    [1,0,0,1,0,1,0,1],
+    [1,0,0,0,0,0,0,1],
+    [1,0,1,0,0,1,0,1],
+    [1,0,0,0,0,0,0,1],
+    [1,1,1,1,1,1,1,1]
+  ],
+  enemies: [],
+  player: { x: 2, y: 2, dir: 0 },
+  weapon: 1,
+  keys: {}
+};
+
+function initDoom() {
+  doomCanvas = document.getElementById('doomCanvas');
+  if (!doomCanvas) return;
+  doomCtx = doomCanvas.getContext('2d');
+  
+  if (!doomState._bound) {
+    doomState._bound = true;
+    
+    document.addEventListener('keydown', function(e) {
+      doomState.keys[e.key.toLowerCase()] = true;
+      if (e.key === '1') doomState.weapon = 1;
+      if (e.key === '2') doomState.weapon = 2;
+      if (e.key === '3') doomState.weapon = 3;
+    });
+    document.addEventListener('keyup', function(e) {
+      doomState.keys[e.key.toLowerCase()] = false;
+    });
+    
+    doomCanvas.addEventListener('click', function() {
+      if (!doomState.running || doomState.ammo <= 0) return;
+      doomState.ammo--;
+      document.getElementById('doomAmmo').textContent = doomState.ammo;
+      
+      // Упрощенная стрельба (попадание, если враг близко к прицелу)
+      for (var i = 0; i < doomState.enemies.length; i++) {
+        var e = doomState.enemies[i];
+        var dx = e.x - doomState.player.x;
+        var dy = e.y - doomState.player.y;
+        var dist = Math.sqrt(dx*dx + dy*dy);
+        
+        // Угол до врага
+        var angleToEnemy = Math.atan2(dy, dx);
+        var angleDiff = Math.abs(angleToEnemy - doomState.player.dir);
+        while (angleDiff > Math.PI) angleDiff = Math.abs(angleDiff - Math.PI*2);
+        
+        if (dist < 8 && angleDiff < 0.3) {
+          // Урон зависит от оружия
+          var dmg = (doomState.weapon === 1 ? 20 : doomState.weapon === 2 ? 50 : 80);
+          e.hp -= dmg;
+          if (e.hp <= 0) {
+            doomState.enemies.splice(i, 1);
+            doomState.kills++;
+            document.getElementById('doomKills').textContent = doomState.kills;
+            state.cash += 100; updateHUD();
+          }
+          break;
+        }
+      }
+    });
+  }
+  doomDraw();
+}
+
+function startDoom() {
+  if (doomState.running) return;
+  doomState.running = true;
+  doomState.hp = 100;
+  doomState.ammo = 50;
+  doomState.kills = 0;
+  doomState.player = { x: 2, y: 2, dir: 0 };
+  doomState.enemies = [
+    { x: 5, y: 5, hp: 100 },
+    { x: 6, y: 2, hp: 100 }
+  ];
+  
+  document.getElementById('doomHp').textContent = '100';
+  document.getElementById('doomAmmo').textContent = '50';
+  document.getElementById('doomKills').textContent = '0';
+  document.getElementById('doomCrosshair').style.display = 'block';
+  
+  doomLoop();
+}
+
+function doomLoop() {
+  if (!doomState.running) return;
+  
+  var p = doomState.player;
+  var speed = 0.05;
+  var rotSpeed = 0.05;
+  
+  if (doomState.keys['w']) { p.x += Math.cos(p.dir) * speed; p.y += Math.sin(p.dir) * speed; }
+  if (doomState.keys['s']) { p.x -= Math.cos(p.dir) * speed; p.y -= Math.sin(p.dir) * speed; }
+  if (doomState.keys['a']) { p.dir -= rotSpeed; }
+  if (doomState.keys['d']) { p.dir += rotSpeed; }
+  
+  // Коллизии со стенами
+  if (doomState.map[Math.floor(p.y)] && doomState.map[Math.floor(p.y)][Math.floor(p.x)] === 1) {
+    p.x -= Math.cos(p.dir) * speed;
+    p.y -= Math.sin(p.dir) * speed;
+  }
+  
+  // Движение врагов к игроку
+  for (var i = 0; i < doomState.enemies.length; i++) {
+    var e = doomState.enemies[i];
+    var dx = p.x - e.x;
+    var dy = p.y - e.y;
+    var dist = Math.sqrt(dx*dx + dy*dy);
+    if (dist > 1) {
+      e.x += (dx / dist) * 0.02;
+      e.y += (dy / dist) * 0.02;
+    } else {
+      // Атака
+      doomState.hp -= 0.5;
+      document.getElementById('doomHp').textContent = Math.max(0, Math.floor(doomState.hp));
+      if (doomState.hp <= 0) {
+        doomState.running = false;
+        document.getElementById('doomCrosshair').style.display = 'none';
+        alert('Вы погибли!');
+        return;
+      }
+    }
+  }
+  
+  doomDraw();
+  doomAnim = requestAnimationFrame(doomLoop);
+}
+
+function doomDraw() {
+  var ctx = doomCtx;
+  var w = doomCanvas.width;
+  var h = doomCanvas.height;
+  var p = doomState.player;
+  
+  // Небо и пол
+  ctx.fillStyle = '#111'; ctx.fillRect(0, 0, w, h/2);
+  ctx.fillStyle = '#222'; ctx.fillRect(0, h/2, w, h/2);
+  
+  // Рендер стен (Raycasting)
+  for (var x = 0; x < w; x += 4) {
+    var rayAngle = p.dir - (Math.PI/4) + (x / w) * (Math.PI/2);
+    var dist = 0;
+    var hit = false;
+    var hitX, hitY;
+    
+    while (!hit && dist < 20) {
+      dist += 0.05;
+      hitX = p.x + Math.cos(rayAngle) * dist;
+      hitY = p.y + Math.sin(rayAngle) * dist;
+      if (doomState.map[Math.floor(hitY)] && doomState.map[Math.floor(hitY)][Math.floor(hitX)] === 1) {
+        hit = true;
+      }
+    }
+    
+    if (hit) {
+      var wallHeight = h / (dist * 0.5);
+      var shade = Math.max(0, 200 - dist * 20);
+      ctx.fillStyle = 'rgb(' + shade + ',' + shade/2 + ',' + shade/2 + ')';
+      ctx.fillRect(x, (h/2) - (wallHeight/2), 4, wallHeight);
+    }
+  }
+  
+  // Рендер врагов
+  for (var i = 0; i < doomState.enemies.length; i++) {
+    var e = doomState.enemies[i];
+    var dx = e.x - p.x;
+    var dy = e.y - p.y;
+    var dist = Math.sqrt(dx*dx + dy*dy);
+    var angle = Math.atan2(dy, dx) - p.dir;
+    while (angle < -Math.PI) angle += Math.PI*2;
+    while (angle > Math.PI) angle -= Math.PI*2;
+    
+    if (Math.abs(angle) < Math.PI/4 && dist > 0.5) {
+      var screenX = w/2 + (angle / (Math.PI/4)) * (w/2);
+      var size = h / (dist * 1.2);
+      ctx.fillStyle = '#8b0000';
+      ctx.beginPath();
+      ctx.arc(screenX, h/2, size/2, 0, Math.PI*2);
+      ctx.fill();
+      ctx.fillStyle = '#fff';
+      ctx.font = Math.floor(size/2) + 'px Arial';
+      ctx.textAlign = 'center';
+      ctx.fillText('🧑‍💼', screenX, h/2 + size/4);
+    }
+  }
+  
+  // Оружие
+  ctx.fillStyle = doomState.weapon === 1 ? '#555' : doomState.weapon === 2 ? '#a05000' : '#00ffff';
+  ctx.fillRect(w/2 - 30, h - 120, 60, 120);
+  ctx.fillStyle = '#000';
+  ctx.fillRect(w/2 - 10, h - 120, 20, 60);
+}
+
+function setWeapon(w) {
+  doomState.weapon = w;
+  document.querySelectorAll('.doom-weapon-btn').forEach(function(b, i) {
+    b.classList.toggle('active', i === w - 1);
+  });
+}
+
+/* ============================================================
+   ИНИЦИАЛИЗАЦИЯ
+   ============================================================ */
+renderMenu();
+updateHUD();
+</script>
