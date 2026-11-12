@@ -327,7 +327,6 @@
   .secret-btn { position:fixed; bottom:12px; left:12px; width:28px; height:28px; border-radius:50%; background:#1e3b2f; color:#f5d100; border:none; font-size:14px; cursor:pointer; z-index:110; opacity:.25; transition:opacity .3s; }
   .secret-btn:hover { opacity:1; }
 
-  /* НОВЫЙ БОЙ DOOM (Raycasting 3D) */
   .doom-container { background:#000; border-radius:14px; overflow:hidden; position:relative; width:100%; max-width:800px; margin:0 auto; }
   .doom-canvas { display:block; width:100%; height:auto; cursor:crosshair; background:#1a0a0a; }
   .doom-hud { position:absolute; bottom:0; left:0; right:0; background:rgba(20,20,20,0.9); color:#ff0000; font-family:'Courier New',monospace; font-weight:bold; font-size:24px; padding:10px 20px; display:flex; justify-content:space-between; border-top:3px solid #444; text-shadow: 0 0 5px #ff0000; }
@@ -351,9 +350,49 @@
   .build-card .btn-build:disabled { background:#e3e8ed; color:#a9b2ba; cursor:not-allowed; }
   .build-progress { background:#e3e8ed; border-radius:8px; height:12px; overflow:hidden; margin-top:10px; }
   .build-progress > div { height:100%; background:linear-gradient(90deg,#e8542f,#f5d100); transition:width .3s; }
+
+  /* Стили для регистрации */
+  .reg-modal { text-align: center; }
+  .reg-modal h3 { font-size:22px; color:#1e3b2f; margin-bottom:8px; }
+  .reg-modal p { font-size:14px; color:#8a97a5; margin-bottom:18px; }
+  .reg-modal .field { text-align:left; }
+  .avatar-choice { display:flex; justify-content:center; gap:12px; margin-bottom:16px; }
+  .avatar-choice button { font-size:28px; background:#f2ecdf; border:2px solid transparent; border-radius:12px; width:56px; height:56px; cursor:pointer; }
+  .avatar-choice button.sel { border-color:#1e3b2f; background:#f5d100; }
 </style>
 </head>
 <body>
+
+<!-- ЭКРАН РЕГИСТРАЦИИ -->
+<div class="overlay" id="authOverlay">
+  <div class="modal reg-modal">
+    <h3>👋 Добро пожаловать!</h3>
+    <p>Войди или зарегистрируйся, чтобы играть и заказывать.</p>
+    <div class="field">
+      <label>Логин (имя)</label>
+      <input id="authName" placeholder="Например, Иван" maxlength="20">
+    </div>
+    <div class="field">
+      <label>Пароль</label>
+      <input id="authPass" type="password" placeholder="Пароль">
+    </div>
+    <div class="field">
+      <label>Выбери аватар</label>
+      <div class="avatar-choice" id="authAvatar">
+        <button class="sel" data-ava="👨‍🍳">👨‍🍳</button>
+        <button data-ava="👩‍🍳">👩‍🍳</button>
+        <button data-ava="🦸">🦸</button>
+        <button data-ava="🐱">🐱</button>
+        <button data-ava="🤖">🤖</button>
+      </div>
+    </div>
+    <div style="display:flex; gap:10px;">
+      <button class="btn-primary" onclick="doAuth('register')">Зарегистрироваться</button>
+      <button class="btn-primary" style="background:#f5d100;color:#1e3b2f;" onclick="doAuth('login')">Войти</button>
+    </div>
+    <p style="font-size:12px; color:#a9b2ba; margin-top:14px; text-align:center;">Если имя уже существует — используй «Войти».</p>
+  </div>
+</div>
 
 <!-- ============ ДОЧКА.РУ ============ -->
 <div id="dnevnik">
@@ -580,6 +619,7 @@
     <button class="game-tab" id="gtab-doom" onclick="gameTab('doom', this)" style="display:none;background:#8b0000;border-color:#8b0000;">🔫 Бой</button>
     <button class="game-tab" onclick="openCasino()" style="background:#4a1f3a;border-color:#4a1f3a;color:#f5d100;">🎰 Казино</button>
     <button class="game-tab" onclick="backToVkst()">← В меню</button>
+    <button class="game-tab" onclick="logout()" style="background:#c0392b;border-color:#c0392b;color:#fff;">Выйти</button>
   </div>
 
   <div class="game-main">
@@ -637,7 +677,6 @@
       </div>
     </div>
 
-    <!-- Стройка -->
     <div class="game-view" id="gview-build">
       <h2 style="color:#1e3b2f; margin-bottom:6px;">🏗️ Стройка «Вкусно и почка»</h2>
       <p style="color:#8a97a5; font-size:14px; margin-bottom:18px;">Построй свой ресторан с нуля. Каждый этап стоит денег и открывает новые бонусы.</p>
@@ -646,12 +685,11 @@
       <div class="build-grid" id="buildGrid"></div>
     </div>
 
-    <!-- НОВЫЙ БОЙ DOOM -->
     <div class="game-view" id="gview-doom">
       <h2 style="color:#8b0000; margin-bottom:6px;">🔫 Бой с Архитектором</h2>
       <p style="color:#8a97a5; font-size:14px; margin-bottom:14px;">Контракт подписан. Уничтожь архитекторов! Клик — выстрел. WASD — движение, мышь — поворот.</p>
       <div class="doom-container" id="doomContainer">
-        <canvas class="doom-canvas" id="doomCanvas" width="800" height="450"></canvas>
+        <canvas class="doom-canvas" id="doomCanvas" width="800" height="450" tabindex="0"></canvas>
         <div class="doom-crosshair" style="display:none;" id="doomCrosshair"></div>
         <div class="doom-hud">
           <span>AMMO: <span id="doomAmmo">50</span></span>
@@ -767,29 +805,6 @@
   </div>
 </div>
 
-<!-- Регистрация -->
-<div class="overlay" id="regOverlay">
-  <div class="modal reg-modal">
-    <h3>👋 Добро пожаловать!</h3>
-    <p>Давай познакомимся. Как тебя зовут?</p>
-    <div class="field">
-      <label>Твоё имя</label>
-      <input id="regName" placeholder="Например, Иван" maxlength="20">
-    </div>
-    <div class="field">
-      <label>Выбери аватар</label>
-      <div class="avatar-choice" id="avatarChoice">
-        <button class="sel" data-ava="👨‍🍳">👨‍🍳</button>
-        <button data-ava="👩‍🍳">👩‍🍳</button>
-        <button data-ava="🦸">🦸</button>
-        <button data-ava="🐱">🐱</button>
-        <button data-ava="🤖">🤖</button>
-      </div>
-    </div>
-    <button class="btn-primary" onclick="doRegister()">Начать игру!</button>
-  </div>
-</div>
-
 <div class="event-popup" id="eventPopup">
   <div class="t" id="eventTitle"></div>
   <div class="d" id="eventDesc"></div>
@@ -817,6 +832,10 @@ function toVkusno() {
   var cd = document.getElementById('countdown'); if (cd) cd.classList.remove('show');
   document.title = 'Вкусно — и почка';
   window.scrollTo(0, 0);
+  
+  if (!state.registered) {
+    setTimeout(showAuth, 300);
+  }
 }
 function closeAd() {
   var ov = document.getElementById('overlay'); if (ov) ov.classList.remove('show');
@@ -903,10 +922,10 @@ var menu = {
   ]
 };
 var RECIPES = [
-  { id:'fries',   n:'Картофель фри', e:'🍟', cost:40,  profit:35,  buy:0,    energy:8,  g:'fries',  type:'fryer',   desc:'Погружай и вовремя вынимай.' },
+  { id:'fries',   n:'Картофель фри', e:'🍟', cost:40,  profit:35,  buy:0,    energy:8,  g:'fries',  type:'fryer',   desc:'Два этапа обжарки.' },
   { id:'cheese',  n:'Чизбургер',     e:'🍔', cost:70,  profit:60,  buy:120,  energy:12, g:'burger', type:'burger',  desc:'Собери бургер по порядку.' },
   { id:'nuggets', n:'Наггетсы',      e:'🍗', cost:90,  profit:80,  buy:200,  energy:14, g:'nuggets',type:'fryer',   desc:'Не пережарь!' },
-  { id:'cola',    n:'Кока-Кола',     e:'🥤', cost:30,  profit:25,  buy:80,   energy:5,  g:'drink',  type:'drink',   desc:'Налей до нужного уровня.' },
+  { id:'cola',    n:'Кока-Кола',     e:'🥤', cost:30,  profit:25,  buy:80,   energy:5,  g:'drink',  type:'drink',   desc:'Налей и не перелей.' },
   { id:'bigspecial',n:'Биг Спешиал', e:'🍔', cost:160, profit:150, buy:350,  energy:20, g:'burger', type:'burger',  desc:'Двойной бургер — точность.' },
   { id:'bigmac',  n:'Биг Хит',       e:'🍔', cost:220, profit:210, buy:600,  energy:26, g:'burger', type:'burger',  desc:'Много слоёв.' },
   { id:'combo',   n:'Комбо дня',     e:'🍱', cost:260, profit:300, buy:900,  energy:30, g:'combo',  type:'drink',   desc:'Напиток + бургер.' },
@@ -929,7 +948,7 @@ var BUILD_STAGES = [
   { id:'foundation', n:'Фундамент', e:'🧱', price:3000,  desc:'Залить фундамент ресторана.' },
   { id:'walls',      n:'Стены',     e:'🧱', price:5000,  desc:'Возвести стены.' },
   { id:'roof',       n:'Крыша',     e:'🏠', price:7000,  desc:'Накрыть крышу.' },
-  { id:'sign',       n:'Вывеска',   e:'🪧', price:4000,  desc:'Повесить вывеску «Вкусно и почка».' },
+  { id:'sign',       n:'Вывеска',   e:'🪧', price:4000,  desc:'Повесить вывеску.' },
   { id:'kitchen',    n:'Кухня',     e:'🍳', price:10000, desc:'Установить оборудование.' },
   { id:'open',       n:'Открытие',  e:'🎉', price:15000, desc:'Открыть ресторан!' }
 ];
@@ -937,9 +956,10 @@ var BUILD_STAGES = [
 /* ============================================================
    ЧАСТЬ 4. СОСТОЯНИЕ
    ============================================================ */
-var SAVE_KEY = 'vkusno_pochka_v6';
+var SAVE_KEY = 'vkusno_pochka_v7';
 var ENERGY_REGEN_MS = 4000;
 var STEP_DEBT_MS = 5 * 60 * 1000;
+var AUTH_KEY = 'vkusno_auth';
 
 var state = {
   cash: 200, debt: 5000, debtBase: 5000, debtDue: Date.now() + STEP_DEBT_MS,
@@ -1017,7 +1037,117 @@ function toast(msg, type) {
 }
 
 /* ============================================================
-   ЧАСТЬ 5. МЕНЮ И КОРЗИНА
+   ЧАСТЬ 5. РЕГИСТРАЦИЯ
+   ============================================================ */
+var LEADERBOARD_URL = 'https://script.google.com/macros/s/AKfycbwnsiy84S76CwUz02I8qqWyFoTARFoq427NNOx5g0MoQIb_0eosLKDgzsJQCvNw1VSHuw/exec';
+
+function checkAuth() {
+  var saved = null;
+  try { saved = JSON.parse(localStorage.getItem(AUTH_KEY) || 'null'); } catch(e) {}
+  if (saved && saved.name && saved.pass) {
+    state.playerName = saved.name;
+    state.avatar = saved.avatar || '👨‍🍳';
+    state.registered = true;
+    save();
+    return true;
+  }
+  return false;
+}
+
+function doAuth(mode) {
+  var name = document.getElementById('authName').value.trim();
+  var pass = document.getElementById('authPass').value;
+  if (!name || !pass) { alert('Введи имя и пароль'); return; }
+  var sel = document.querySelector('#authAvatar button.sel');
+  var ava = sel ? sel.dataset.ava : '👨‍🍳';
+  
+  var acc = { name: name, pass: pass, avatar: ava, createdAt: Date.now() };
+  
+  if (typeof LEADERBOARD_URL !== 'undefined' && LEADERBOARD_URL && LEADERBOARD_URL.indexOf('ВСТАВЬ') === -1) {
+    var formData = new URLSearchParams();
+    formData.append('action', mode);
+    formData.append('name', name);
+    formData.append('pass', pass);
+    formData.append('avatar', ava);
+    
+    fetch(LEADERBOARD_URL, { method: 'POST', body: formData })
+      .then(function(res) { return res.json(); })
+      .then(function(data) {
+        if (data.error) { alert(data.error); return; }
+        if (data.exists && mode === 'register') { alert('Такое имя уже есть. Используй «Войти».'); return; }
+        if (!data.exists && mode === 'login') { alert('Игрок не найден. Зарегистрируйся.'); return; }
+        
+        try { localStorage.setItem(AUTH_KEY, JSON.stringify(acc)); } catch(e) {}
+        state.playerName = name;
+        state.avatar = ava;
+        state.registered = true;
+        if (data.player) {
+          state.cash = Number(data.player.cash) || 200;
+          state.debt = Number(data.player.debt) || 5000;
+          state.energy = Number(data.player.energy) || 100;
+          state.bestCash = Number(data.player.bestCash) || 200;
+          try { state.owned = JSON.parse(data.player.owned || '{"fries":true}'); } catch(e) { state.owned = {fries:true}; }
+          try { state.ownedShop = JSON.parse(data.player.ownedShop || '{}'); } catch(e) { state.ownedShop = {}; }
+          try { state.buildProgress = JSON.parse(data.player.buildProgress || '{}'); } catch(e) { state.buildProgress = {}; }
+          state.contractSigned = String(data.player.contractSigned) === 'true';
+        }
+        save(); updateHUD();
+        document.getElementById('authOverlay').classList.remove('show');
+        toast('Привет, ' + name + '! 👋', 'good');
+      })
+      .catch(function(err) {
+        console.log('Ошибка авторизации:', err);
+        alert('Не удалось связаться с сервером. Попробуй позже.');
+      });
+  } else {
+    try { localStorage.setItem(AUTH_KEY, JSON.stringify(acc)); } catch(e) {}
+    state.playerName = name;
+    state.avatar = ava;
+    state.registered = true;
+    save();
+    document.getElementById('authOverlay').classList.remove('show');
+    toast('Привет, ' + name + '! 👋', 'good');
+  }
+}
+
+function logout() {
+  if (!confirm('Выйти из аккаунта?')) return;
+  try { localStorage.removeItem(AUTH_KEY); } catch(e) {}
+  state.playerName = 'Игрок';
+  state.registered = false;
+  save();
+  document.getElementById('gameScreen').style.display = 'none';
+  document.getElementById('casinoScreen').style.display = 'none';
+  document.getElementById('vkst').style.display = 'none';
+  document.getElementById('dnevnik').style.display = 'block';
+  setTimeout(showAuth, 500);
+}
+
+function showAuth() {
+  document.getElementById('authName').value = '';
+  document.getElementById('authPass').value = '';
+  document.querySelectorAll('#authAvatar button').forEach(function(b, i){
+    b.classList.toggle('sel', i === 0);
+  });
+  document.getElementById('authOverlay').classList.add('show');
+}
+
+document.addEventListener('click', function(e){
+  if (e.target.matches('#authAvatar button')) {
+    document.querySelectorAll('#authAvatar button').forEach(function(b){ b.classList.remove('sel'); });
+    e.target.classList.add('sel');
+  }
+});
+
+// Проверка при загрузке
+window.addEventListener('load', function() {
+  if (!checkAuth()) {
+    setTimeout(showAuth, 500);
+  }
+});
+
+/* ============================================================
+   ЧАСТЬ 6. МЕНЮ И КОРЗИНА
    ============================================================ */
 var cart = {};
 
@@ -1093,6 +1223,7 @@ function updateBadge() {
 var authorized = false, deliveryType = 'delivery', lastOrder = null, orderPlacedAt = 0;
 
 function openCart() {
+  if (!state.registered) { showAuth(); return; }
   var body = document.getElementById('cartModalBody');
   if (!body) return;
   var items = [];
@@ -1275,9 +1406,10 @@ function closeMyOrder() {
 function trackMyOrder() { if (lastOrder) showTrack(); }
 
 /* ============================================================
-   ЧАСТЬ 6. ИГРА
+   ЧАСТЬ 7. ИГРА
    ============================================================ */
 function openGame() {
+  if (!state.registered) { showAuth(); return; }
   document.getElementById('vkst').classList.remove('show');
   document.getElementById('casinoScreen').style.display = 'none';
   document.getElementById('gameScreen').style.display = 'block';
@@ -1285,7 +1417,6 @@ function openGame() {
   document.title = 'Кухня — Вкусно и почка';
   gameTab('cook', document.getElementById('gtab-cook'));
   updateHUD(); renderCook(); renderRecipes(); renderShop(); renderCredit(); renderLeaders(); renderBuild();
-  if (!state.registered) showRegister();
   showManager();
   window.scrollTo(0, 0);
 }
@@ -1315,33 +1446,6 @@ function gameTab(id, el) {
   if (id === 'build') renderBuild();
   if (id === 'doom') initDoom();
 }
-function showRegister() {
-  if (state.registered) return;
-  var inp = document.getElementById('regName');
-  if (inp) inp.value = state.playerName === 'Игрок' ? '' : state.playerName;
-  document.querySelectorAll('#avatarChoice button').forEach(function(b){
-    b.classList.toggle('sel', b.dataset.ava === state.avatar);
-  });
-  document.getElementById('regOverlay').classList.add('show');
-}
-function doRegister() {
-  var name = document.getElementById('regName').value.trim();
-  if (!name) { alert('Введи имя'); return; }
-  state.playerName = name;
-  var sel = document.querySelector('#avatarChoice button.sel');
-  state.avatar = sel ? sel.dataset.ava : '👨‍🍳';
-  state.registered = true;
-  save();
-  document.getElementById('regOverlay').classList.remove('show');
-  updateLeaderEntry();
-  toast('Привет, ' + name + '! 👋', 'good');
-}
-document.addEventListener('click', function(e){
-  if (e.target.matches('#avatarChoice button')) {
-    document.querySelectorAll('#avatarChoice button').forEach(function(b){ b.classList.remove('sel'); });
-    e.target.classList.add('sel');
-  }
-});
 function claimDailyBonus() {
   var today = new Date().toDateString();
   if (state.lastDailyBonus === today) { toast('Бонус уже получен сегодня', 'bad'); return; }
@@ -1511,6 +1615,9 @@ function checkDebtDeadline() {
 setInterval(checkDebtDeadline, 15000);
 setInterval(updateHUD, 5000);
 
+/* ============================================================
+   ЛИДЕРЫ
+   ============================================================ */
 function getLeaders() {
   try { return JSON.parse(localStorage.getItem('vkusno_leaders') || '[]'); }
   catch(e) { return []; }
@@ -1526,13 +1633,26 @@ function saveLeaderName() {
 }
 function updateLeaderEntry() {
   if (!state.registered) return;
-  var arr = getLeaders();
-  var existing = null;
-  for (var i = 0; i < arr.length; i++) if (arr[i].name === state.playerName) existing = arr[i];
-  if (existing) existing.score = Math.max(existing.score, state.bestCash);
-  else arr.push({ name: state.playerName, score: state.bestCash });
-  arr.sort(function(a, b){ return b.score - a.score; });
-  saveLeaders(arr.slice(0, 20));
+  
+  if (LEADERBOARD_URL === 'ВСТАВЬ_СЮДА_ССЫЛКУ_ИЗ_ШАГА_3') {
+    var arr = getLeaders();
+    var existing = null;
+    for (var i = 0; i < arr.length; i++) if (arr[i].name === state.playerName) existing = arr[i];
+    if (existing) existing.score = Math.max(existing.score, state.bestCash);
+    else arr.push({ name: state.playerName, score: state.bestCash });
+    arr.sort(function(a, b){ return b.score - a.score; });
+    saveLeaders(arr.slice(0, 20));
+    return;
+  }
+  
+  var formData = new URLSearchParams();
+  formData.append('action', 'score');
+  formData.append('name', state.playerName);
+  formData.append('score', state.bestCash);
+  
+  fetch(LEADERBOARD_URL, { method: 'POST', body: formData }).catch(function(err) {
+    console.log('Ошибка отправки в таблицу:', err);
+  });
 }
 function renderLeaders() {
   updateLeaderEntry();
@@ -1540,24 +1660,55 @@ function renderLeaders() {
   var inp = document.getElementById('lbName');
   if (inp && !inp.value) inp.value = state.playerName;
   if (!list) return;
-  var arr = getLeaders();
-  if (arr.length === 0) { list.innerHTML = '<p style="color:#8a97a5;">Пока никого нет. Поиграй — и попади в таблицу!</p>'; return; }
-  var html = '';
-  for (var i = 0; i < arr.length; i++) {
-    var x = arr[i];
-    var me = x.name === state.playerName;
-    var placeClass = i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : '';
-    html += '<div class="lb-row ' + (me ? 'me' : '') + '">' +
-      '<span class="place ' + placeClass + '">' + (i + 1) + '</span>' +
-      '<span class="who">' + x.name + (me ? ' (ты)' : '') + '</span>' +
-      '<span class="score">' + fmt(x.score) + ' ₽</span>' +
-    '</div>';
+  
+  if (LEADERBOARD_URL === 'ВСТАВЬ_СЮДА_ССЫЛКУ_ИЗ_ШАГА_3') {
+    var arr = getLeaders();
+    if (arr.length === 0) { list.innerHTML = '<p style="color:#8a97a5;">Пока никого нет. Поиграй — и попади в таблицу!</p>'; return; }
+    var html = '';
+    for (var i = 0; i < arr.length; i++) {
+      var x = arr[i];
+      var me = x.name === state.playerName;
+      var placeClass = i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : '';
+      html += '<div class="lb-row ' + (me ? 'me' : '') + '">' +
+        '<span class="place ' + placeClass + '">' + (i + 1) + '</span>' +
+        '<span class="who">' + x.name + (me ? ' (ты)' : '') + '</span>' +
+        '<span class="score">' + fmt(x.score) + ' ₽</span>' +
+      '</div>';
+    }
+    list.innerHTML = html;
+    return;
   }
-  list.innerHTML = html;
+  
+  list.innerHTML = '<p style="color:#8a97a5;">Загрузка таблицы лидеров...</p>';
+  
+  fetch(LEADERBOARD_URL + '?action=leaderboard&v=' + Date.now())
+    .then(function(response) { return response.json(); })
+    .then(function(data) {
+      if (!data || data.length === 0) {
+        list.innerHTML = '<p style="color:#8a97a5;">Пока никого нет. Поиграй — и попади в таблицу!</p>';
+        return;
+      }
+      var html = '';
+      for (var i = 0; i < data.length && i < 20; i++) {
+        var x = data[i];
+        var me = x.name === state.playerName;
+        var placeClass = i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : '';
+        html += '<div class="lb-row ' + (me ? 'me' : '') + '">' +
+          '<span class="place ' + placeClass + '">' + (i + 1) + '</span>' +
+          '<span class="who">' + x.name + (me ? ' (ты)' : '') + '</span>' +
+          '<span class="score">' + fmt(x.score) + ' ₽</span>' +
+        '</div>';
+      }
+      list.innerHTML = html;
+    })
+    .catch(function(err) {
+      console.log('Ошибка загрузки таблицы:', err);
+      list.innerHTML = '<p style="color:#c0392b;">Не удалось загрузить таблицу. Проверь интернет.</p>';
+    });
 }
 
 /* ============================================================
-   ЧАСТЬ 7. МИНИ-ИГРЫ (усложнённые)
+   МИНИ-ИГРЫ
    ============================================================ */
 var currentMinigame = null;
 function closeMinigameModal() {
@@ -1669,7 +1820,6 @@ function startBurgerGame(body, r) {
   spawn();
 }
 
-/* Фритюр — усложнён: два этапа (обжарка и встряхивание) */
 function startFryerGame(body, r) {
   body.innerHTML = '<div class="minigame fryer-wrap">' +
     '<h3>🍟 Фритюр: ' + r.n + '</h3>' +
@@ -1752,7 +1902,6 @@ function startFryerGame(body, r) {
   }
 }
 
-/* Напиток — усложнён: нужно налить до уровня и не перелить, плюс пена */
 function startDrinkGame(body, r) {
   body.innerHTML = '<div class="minigame drink-wrap">' +
     '<h3>🥤 Напиток: ' + r.n + '</h3>' +
@@ -1778,7 +1927,7 @@ function startDrinkGame(body, r) {
   target.style.height = (tEnd - tStart) + '%';
   var pouring = false, t0 = 0, rafId = null;
   var totalMs = 3500;
-  var speed = 1.4 + Math.random() * 0.4; // усложнение: скорость налива
+  var speed = 1.4 + Math.random() * 0.4;
   btn.addEventListener('click', function() {
     if (!pouring) {
       pouring = true; t0 = performance.now();
@@ -1833,7 +1982,7 @@ function maybeRandomEvent() {
 function closeEvent() { document.getElementById('eventPopup').classList.remove('show'); }
 
 /* ============================================================
-   ЧАСТЬ 8. МЕНЕДЖЕР
+   МЕНЕДЖЕР
    ============================================================ */
 var MANAGER_LINES = [
   'Ты бездарь, работай лучше!',
@@ -1895,7 +2044,7 @@ function callManager() {
 }
 
 /* ============================================================
-   ЧАСТЬ 9. СЕКРЕТНЫЙ КОНТРАКТ
+   КОНТРАКТ
    ============================================================ */
 function openSecret() {
   var ov = document.getElementById('secretOverlay');
@@ -1909,23 +2058,23 @@ function closeSecret() {
   document.getElementById('secretOverlay').classList.remove('show');
 }
 function signContract() {
-  var inp = document.getElementById('contractSign');
-  var name = (inp.value || '').trim();
-  if (!name) { alert('Введи имя для подписи'); return; }
-  state.playerName = name;
+  if (!state.registered) { showAuth(); return; }
   state.contractSigned = true;
-  state.registered = true;
   save();
   updateHUD();
   document.getElementById('secretOverlay').classList.remove('show');
   toast('📜 Контракт подписан! Открыты вкладки «Стройка» и «Бой».', 'good');
-  managerSpeak(false, 'Ну наконец-то, бездарь. Теперь работай!');
+  managerSpeak(false, 'Ну наконец-то, ' + state.playerName + '. Теперь работай!');
 }
 
 /* ============================================================
-   ЧАСТЬ 10. СТРОЙКА
+   СТРОЙКА (мини-игра с зарплатой)
    ============================================================ */
 function openBuildTab() {
+  if (!state.contractSigned) {
+    toast('Сначала подпиши контракт (🔒 в левом нижнем углу)', 'bad');
+    return;
+  }
   gameTab('build', document.getElementById('gtab-build'));
 }
 function renderBuild() {
@@ -1959,11 +2108,53 @@ function buildStage(id) {
   for (var i = 0; i < BUILD_STAGES.length; i++) if (BUILD_STAGES[i].id === id) s = BUILD_STAGES[i];
   if (!s || state.buildProgress[id]) return;
   if (state.cash < s.price) { toast('Не хватает денег на этап', 'bad'); return; }
-  state.cash -= s.price;
+  
+  if (currentMinigame) closeMinigameModal();
+  var overlay = document.createElement('div');
+  overlay.className = 'overlay show'; overlay.id = 'minigameOverlay';
+  overlay.innerHTML = '<div class="modal" id="minigameModalBody"></div>';
+  document.body.appendChild(overlay);
+  var body = document.getElementById('minigameModalBody');
+  
+  body.innerHTML = '<div class="minigame" style="text-align:center;">' +
+    '<h3>🏗️ Стройка: ' + s.n + '</h3>' +
+    '<p>Нажимай на молоток как можно быстрее! Каждый удар приносит 10 ₽ зарплаты.</p>' +
+    '<div id="hammer" style="font-size:80px; cursor:pointer; user-select:none; margin:20px 0; display:inline-block;">🔨</div>' +
+    '<p style="font-size:16px; font-weight:700;">Заработано: <span id="buildEarned">0</span> ₽</p>' +
+    '<p style="font-size:13px; color:#8a97a5;">Осталось ударов: <span id="buildHits">10</span></p>' +
+    '<button class="btn-primary" id="buildFinishBtn" style="display:none;" onclick="finishBuild(' + s.price + ', \'' + s.id + '\')">Завершить</button>' +
+  '</div>';
+  
+  var earned = 0, hits = 10;
+  var hammer = document.getElementById('hammer');
+  var earnedEl = document.getElementById('buildEarned');
+  var hitsEl = document.getElementById('buildHits');
+  var finishBtn = document.getElementById('buildFinishBtn');
+  
+  hammer.addEventListener('click', function() {
+    if (hits <= 0) return;
+    hits--;
+    earned += 10;
+    earnedEl.textContent = earned;
+    hitsEl.textContent = hits;
+    hammer.style.transform = 'scale(1.2) rotate(-15deg)';
+    setTimeout(function(){ hammer.style.transform = 'scale(1) rotate(0deg)'; }, 100);
+    if (hits === 0) {
+      finishBtn.style.display = 'inline-block';
+      hammer.style.opacity = '0.5';
+      hammer.style.cursor = 'default';
+    }
+  });
+}
+function finishBuild(price, id) {
+  var earned = parseInt(document.getElementById('buildEarned').textContent) || 0;
+  closeMinigameModal();
+  state.cash -= price;
+  state.cash += earned;
   state.buildProgress[id] = true;
   if (state.cash > state.bestCash) state.bestCash = state.cash;
   updateHUD(); save(); renderBuild();
-  toast('🏗️ Этап «' + s.n + '» готов!', 'good');
+  toast('🏗️ Этап «' + id + '» готов! Заработано: ' + earned + ' ₽', 'good');
   var doneCount = 0;
   for (var k in state.buildProgress) if (state.buildProgress[k]) doneCount++;
   if (doneCount === BUILD_STAGES.length) {
@@ -1974,9 +2165,10 @@ function buildStage(id) {
 }
 
 /* ============================================================
-   ЧАСТЬ 11. КАЗИНО
+   КАЗИНО
    ============================================================ */
 function openCasino() {
+  if (!state.registered) { showAuth(); return; }
   document.getElementById('vkst').classList.remove('show');
   document.getElementById('gameScreen').style.display = 'none';
   document.getElementById('casinoScreen').style.display = 'block';
@@ -2152,25 +2344,28 @@ function renderCasinoHistory() {
 }
 
 /* ============================================================
-   ЧАСТЬ 12. НОВЫЙ 3D БОЙ (DOOM RAYCASTING)
+   DOOM (Raycasting 3D) - ИСПРАВЛЕН
    ============================================================ */
 var doomCanvas, doomCtx, doomAnim;
 var doomState = {
   running: false, hp: 100, ammo: 50, kills: 0,
   map: [
-    [1,1,1,1,1,1,1,1],
-    [1,0,0,0,0,0,0,1],
-    [1,0,0,1,0,0,0,1],
-    [1,0,0,1,0,1,0,1],
-    [1,0,0,0,0,0,0,1],
-    [1,0,1,0,0,1,0,1],
-    [1,0,0,0,0,0,0,1],
-    [1,1,1,1,1,1,1,1]
+    [1,1,1,1,1,1,1,1,1,1],
+    [1,0,0,0,0,0,0,0,0,1],
+    [1,0,0,1,0,0,1,0,0,1],
+    [1,0,0,1,0,0,1,0,0,1],
+    [1,0,0,0,0,0,0,0,0,1],
+    [1,0,1,1,0,0,1,1,0,1],
+    [1,0,0,0,0,0,0,0,0,1],
+    [1,0,0,1,0,0,1,0,0,1],
+    [1,0,0,0,0,0,0,0,0,1],
+    [1,1,1,1,1,1,1,1,1,1]
   ],
   enemies: [],
-  player: { x: 2, y: 2, dir: 0 },
+  player: { x: 1.5, y: 1.5, dir: 0 },
   weapon: 1,
-  keys: {}
+  keys: {},
+  lastFrameTime: 0
 };
 
 function initDoom() {
@@ -2181,35 +2376,22 @@ function initDoom() {
   if (!doomState._bound) {
     doomState._bound = true;
     
-    document.addEventListener('keydown', function(e) {
-      doomState.keys[e.key.toLowerCase()] = true;
-      if (e.key === '1') doomState.weapon = 1;
-      if (e.key === '2') doomState.weapon = 2;
-      if (e.key === '3') doomState.weapon = 3;
-    });
-    document.addEventListener('keyup', function(e) {
-      doomState.keys[e.key.toLowerCase()] = false;
-    });
-    
     doomCanvas.addEventListener('click', function() {
       if (!doomState.running || doomState.ammo <= 0) return;
       doomState.ammo--;
       document.getElementById('doomAmmo').textContent = doomState.ammo;
       
-      // Упрощенная стрельба (попадание, если враг близко к прицелу)
+      var hitSomething = false;
       for (var i = 0; i < doomState.enemies.length; i++) {
         var e = doomState.enemies[i];
         var dx = e.x - doomState.player.x;
         var dy = e.y - doomState.player.y;
         var dist = Math.sqrt(dx*dx + dy*dy);
-        
-        // Угол до врага
         var angleToEnemy = Math.atan2(dy, dx);
         var angleDiff = Math.abs(angleToEnemy - doomState.player.dir);
         while (angleDiff > Math.PI) angleDiff = Math.abs(angleDiff - Math.PI*2);
         
-        if (dist < 8 && angleDiff < 0.3) {
-          // Урон зависит от оружия
+        if (dist < 8 && angleDiff < 0.4) {
           var dmg = (doomState.weapon === 1 ? 20 : doomState.weapon === 2 ? 50 : 80);
           e.hp -= dmg;
           if (e.hp <= 0) {
@@ -2218,8 +2400,13 @@ function initDoom() {
             document.getElementById('doomKills').textContent = doomState.kills;
             state.cash += 100; updateHUD();
           }
+          hitSomething = true;
           break;
         }
+      }
+      if (hitSomething) {
+        doomCanvas.style.backgroundColor = '#4a0000';
+        setTimeout(function(){ doomCanvas.style.backgroundColor = '#1a0a0a'; }, 100);
       }
     });
   }
@@ -2232,10 +2419,10 @@ function startDoom() {
   doomState.hp = 100;
   doomState.ammo = 50;
   doomState.kills = 0;
-  doomState.player = { x: 2, y: 2, dir: 0 };
+  doomState.player = { x: 1.5, y: 1.5, dir: 0 };
   doomState.enemies = [
-    { x: 5, y: 5, hp: 100 },
-    { x: 6, y: 2, hp: 100 }
+    { x: 5, y: 5, hp: 50, speed: 0.01, dmg: 0.1 },
+    { x: 7, y: 3, hp: 50, speed: 0.01, dmg: 0.1 }
   ];
   
   document.getElementById('doomHp').textContent = '100';
@@ -2243,39 +2430,56 @@ function startDoom() {
   document.getElementById('doomKills').textContent = '0';
   document.getElementById('doomCrosshair').style.display = 'block';
   
+  doomCanvas.focus();
+  doomCanvas.onkeydown = function(e) {
+    doomState.keys[e.key.toLowerCase()] = true;
+    if (e.key === '1') doomState.weapon = 1;
+    if (e.key === '2') doomState.weapon = 2;
+    if (e.key === '3') doomState.weapon = 3;
+  };
+  doomCanvas.onkeyup = function(e) {
+    doomState.keys[e.key.toLowerCase()] = false;
+  };
+  
+  doomState.lastFrameTime = performance.now();
   doomLoop();
 }
 
-function doomLoop() {
+function doomLoop(now) {
   if (!doomState.running) return;
+  now = now || performance.now();
+  var dt = Math.min(0.1, (now - doomState.lastFrameTime) / 1000);
+  doomState.lastFrameTime = now;
   
   var p = doomState.player;
-  var speed = 0.05;
-  var rotSpeed = 0.05;
+  var speed = 2.0 * dt;
+  var rotSpeed = 1.5 * dt;
   
   if (doomState.keys['w']) { p.x += Math.cos(p.dir) * speed; p.y += Math.sin(p.dir) * speed; }
   if (doomState.keys['s']) { p.x -= Math.cos(p.dir) * speed; p.y -= Math.sin(p.dir) * speed; }
   if (doomState.keys['a']) { p.dir -= rotSpeed; }
   if (doomState.keys['d']) { p.dir += rotSpeed; }
   
-  // Коллизии со стенами
-  if (doomState.map[Math.floor(p.y)] && doomState.map[Math.floor(p.y)][Math.floor(p.x)] === 1) {
-    p.x -= Math.cos(p.dir) * speed;
-    p.y -= Math.sin(p.dir) * speed;
+  var newX = p.x;
+  var newY = p.y;
+  if (doomState.map[Math.floor(newY)] && doomState.map[Math.floor(newY)][Math.floor(newX)] === 1) {
+    if (!(doomState.map[Math.floor(p.y)] && doomState.map[Math.floor(p.y)][Math.floor(newX)] === 1)) p.x = newX;
+    if (!(doomState.map[Math.floor(newY)] && doomState.map[Math.floor(newY)][Math.floor(p.x)] === 1)) p.y = newY;
+  } else {
+    p.x = newX;
+    p.y = newY;
   }
   
-  // Движение врагов к игроку
   for (var i = 0; i < doomState.enemies.length; i++) {
     var e = doomState.enemies[i];
     var dx = p.x - e.x;
     var dy = p.y - e.y;
     var dist = Math.sqrt(dx*dx + dy*dy);
-    if (dist > 1) {
-      e.x += (dx / dist) * 0.02;
-      e.y += (dy / dist) * 0.02;
+    if (dist > 1.5) {
+      e.x += (dx / dist) * e.speed * dt * 60;
+      e.y += (dy / dist) * e.speed * dt * 60;
     } else {
-      // Атака
-      doomState.hp -= 0.5;
+      doomState.hp -= e.dmg * dt * 60;
       document.getElementById('doomHp').textContent = Math.max(0, Math.floor(doomState.hp));
       if (doomState.hp <= 0) {
         doomState.running = false;
@@ -2296,11 +2500,9 @@ function doomDraw() {
   var h = doomCanvas.height;
   var p = doomState.player;
   
-  // Небо и пол
   ctx.fillStyle = '#111'; ctx.fillRect(0, 0, w, h/2);
   ctx.fillStyle = '#222'; ctx.fillRect(0, h/2, w, h/2);
   
-  // Рендер стен (Raycasting)
   for (var x = 0; x < w; x += 4) {
     var rayAngle = p.dir - (Math.PI/4) + (x / w) * (Math.PI/2);
     var dist = 0;
@@ -2319,12 +2521,11 @@ function doomDraw() {
     if (hit) {
       var wallHeight = h / (dist * 0.5);
       var shade = Math.max(0, 200 - dist * 20);
-      ctx.fillStyle = 'rgb(' + shade + ',' + shade/2 + ',' + shade/2 + ')';
+      ctx.fillStyle = 'rgb(' + shade + ',' + (shade/2) + ',' + (shade/2) + ')';
       ctx.fillRect(x, (h/2) - (wallHeight/2), 4, wallHeight);
     }
   }
   
-  // Рендер врагов
   for (var i = 0; i < doomState.enemies.length; i++) {
     var e = doomState.enemies[i];
     var dx = e.x - p.x;
@@ -2348,7 +2549,6 @@ function doomDraw() {
     }
   }
   
-  // Оружие
   ctx.fillStyle = doomState.weapon === 1 ? '#555' : doomState.weapon === 2 ? '#a05000' : '#00ffff';
   ctx.fillRect(w/2 - 30, h - 120, 60, 120);
   ctx.fillStyle = '#000';
@@ -2368,3 +2568,5 @@ function setWeapon(w) {
 renderMenu();
 updateHUD();
 </script>
+</body>
+</html>
