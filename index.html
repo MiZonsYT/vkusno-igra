@@ -927,7 +927,6 @@ var RECIPES = [
   { id:'bigmac',  n:'Биг Хит',       e:'🍔', cost:220, profit:210, buy:600,  energy:26, g:'burger', type:'burger',  desc:'Много слоёв.' },
   { id:'combo',   n:'Комбо дня',     e:'🍱', cost:260, profit:300, buy:900,  energy:30, g:'combo',  type:'drink',   desc:'Напиток + бургер.' },
   { id:'mega',    n:'Мега Бокс',     e:'📦', cost:400, profit:520, buy:1500, energy:40, g:'combo',  type:'fryer',   desc:'Максимальная прибыль.' },
-  // НОВЫЕ РЕЦЕПТЫ
   { id:'goldgrand', n:'Золотой Гранд', e:'🥇', cost:600, profit:900, buy:3000, energy:50, g:'gold', type:'burger', desc:'Премиум-бургер с золотом.' },
   { id:'royalset',  n:'Королевский сет', e:'👑', cost:900, profit:1500, buy:6000, energy:55, g:'royal', type:'drink', desc:'Сет для настоящих королей.' },
   { id:'chefbox',   n:'Шеф-бокс', e:'🧑‍🍳', cost:1400, profit:2500, buy:10000, energy:60, g:'chef', type:'fryer', desc:'Эксклюзив от шефа.' },
@@ -953,7 +952,6 @@ var BUILD_STAGES = [
   { id:'sign',       n:'Вывеска',   e:'🪧', price:4000,  desc:'Повесить вывеску.' },
   { id:'kitchen',    n:'Кухня',     e:'🍳', price:10000, desc:'Установить оборудование.' },
   { id:'open',       n:'Открытие',  e:'🎉', price:15000, desc:'Открыть ресторан!' },
-  // НОВЫЕ ЭТАПЫ СТРОЙКИ
   { id:'floor2',     n:'Второй этаж', e:'🏢', price:20000, desc:'Расширить ресторан.' },
   { id:'terrace',    n:'Летняя веранда', e:'⛱️', price:25000, desc:'Место для отдыха.' },
   { id:'kidsroom',   n:'Детская комната', e:'🧸', price:30000, desc:'Для маленьких гостей.' }
@@ -969,11 +967,11 @@ var ACHIEVEMENTS = [
 /* ============================================================
    ЧАСТЬ 4. СОСТОЯНИЕ
    ============================================================ */
-var SAVE_KEY = 'vkusno_pochka_v8';
+var SAVE_KEY = 'vkusno_pochka_v9';
 var ENERGY_REGEN_MS = 4000;
 var STEP_DEBT_MS = 5 * 60 * 1000;
 var AUTH_KEY = 'vkusno_auth';
-var PASSIVE_INCOME_MS = 30000; // Пассивный доход каждые 30 сек
+var PASSIVE_INCOME_MS = 30000;
 
 var state = {
   cash: 200, debt: 5000, debtBase: 5000, debtDue: Date.now() + STEP_DEBT_MS,
@@ -982,7 +980,6 @@ var state = {
   lastDailyBonus: 0, casinoHistory: [],
   contractSigned: false, buildProgress: {},
   doomKills: 0, doomWave: 1,
-  // Новые поля
   xp: 0, level: 1, cookCount: 0, casinoWins: 0, achievements: {},
   dailyQuests: { cook: 0, casino: 0, build: 0, claimed: {} },
   lastPassiveIncome: Date.now()
@@ -1037,6 +1034,22 @@ function updateHUD() {
   if (el('gEnergyBar')) el('gEnergyBar').style.width = state.energy + '%';
   if (el('cCash')) el('cCash').textContent = fmt(state.cash);
   if (el('cCash2')) el('cCash2').textContent = fmt(state.cash);
+  
+  // Отображение уровня и XP в шапке
+  if (!el('gLevelBadge')) {
+    var bar = document.querySelector('.game-bar .title');
+    if (bar) {
+      var badge = document.createElement('span');
+      badge.id = 'gLevelBadge';
+      badge.style.cssText = 'background:#4a1f3a;color:#f5d100;padding:4px 10px;border-radius:12px;font-size:13px;font-weight:bold;margin-right:10px;';
+      bar.parentNode.insertBefore(badge, bar.nextSibling);
+    }
+  }
+  if (el('gLevelBadge')) {
+    var nextXP = state.level * 100;
+    el('gLevelBadge').textContent = '🏅 Ур. ' + state.level + ' (' + state.xp + '/' + nextXP + ' XP)';
+  }
+
   var timerEl = el('gDebtTimer');
   if (timerEl) {
     if (state.debt > 0 && state.debtDue) {
@@ -1089,7 +1102,6 @@ function doAuth(mode) {
   var sel = document.querySelector('#authAvatar button.sel');
   var ava = sel ? sel.dataset.ava : '👨‍🍳';
   
-  // Локальное сохранение (всегда работает)
   var acc = { name: name, pass: pass, avatar: ava, createdAt: Date.now() };
   try { localStorage.setItem(AUTH_KEY, JSON.stringify(acc)); } catch(e) {}
   state.playerName = name;
@@ -1110,6 +1122,8 @@ function doAuth(mode) {
     })
     .then(function(res) { return res.json(); })
     .then(function(data) {
+      console.log('Ответ от Google:', data);
+      
       if (data.error) { alert(data.error); return; }
       if (data.exists && mode === 'register') { alert('Такое имя уже есть. Используй «Войти».'); return; }
       if (!data.exists && mode === 'login') { alert('Игрок не найден. Зарегистрируйся.'); return; }
@@ -1119,9 +1133,15 @@ function doAuth(mode) {
         state.debt = Number(data.player.debt) || 5000;
         state.energy = Number(data.player.energy) || 100;
         state.bestCash = Number(data.player.bestCash) || 200;
+        state.xp = Number(data.player.xp) || 0;
+        state.level = Number(data.player.level) || 1;
+        state.cookCount = Number(data.player.cookCount) || 0;
+        state.casinoWins = Number(data.player.casinoWins) || 0;
         try { state.owned = JSON.parse(data.player.owned || '{"fries":true}'); } catch(e) { state.owned = {fries:true}; }
         try { state.ownedShop = JSON.parse(data.player.ownedShop || '{}'); } catch(e) { state.ownedShop = {}; }
         try { state.buildProgress = JSON.parse(data.player.buildProgress || '{}'); } catch(e) { state.buildProgress = {}; }
+        try { state.achievements = JSON.parse(data.player.achievements || '{}'); } catch(e) { state.achievements = {}; }
+        try { state.dailyQuests = JSON.parse(data.player.dailyQuests || '{"cook":0,"casino":0,"build":0,"claimed":{}}'); } catch(e) { state.dailyQuests = {cook:0,casino:0,build:0,claimed:{}}; }
         state.contractSigned = String(data.player.contractSigned) === 'true';
         save(); updateHUD();
       }
@@ -1130,7 +1150,6 @@ function doAuth(mode) {
     })
     .catch(function(err) {
       console.log('Ошибка авторизации:', err);
-      // Если сервер упал, но локально залогинились — идём в игру
       document.getElementById('authOverlay').classList.remove('show');
       toast('Привет, ' + name + '! (Локальный режим)', 'good');
     });
@@ -1439,7 +1458,7 @@ function addXP(amount) {
   var newLevel = Math.floor(state.xp / 100) + 1;
   if (newLevel > state.level) {
     state.level = newLevel;
-    toast('🎉 Новый уровень ' + newLevel + '!', 'good');
+    toast('🎉 Новый уровень ' + newLevel + '! Бонус: +' + (newLevel * 10) + '% к прибыли.', 'good');
     save();
   }
 }
@@ -1579,13 +1598,16 @@ function renderCook() {
   var html = '';
   for (var i = 0; i < owned.length; i++) {
     var r = owned[i];
+    // Бонус к прибыли от уровня
+    var levelBonus = 1 + (state.level - 1) * 0.1;
+    var finalProfit = Math.round(r.profit * levelBonus);
     html += '<div class="recipe-card">' +
       '<div class="recipe-photo" style="background:' + photoGrads[r.g] + ';">' + r.e + '</div>' +
       '<div class="recipe-body">' +
         '<div class="n">' + r.n + '</div>' +
         '<div class="meta">' + r.desc + '</div>' +
         '<div class="meta">Энергия: ' + r.energy + '</div>' +
-        '<div class="row"><span class="profit">+' + r.profit + ' ₽</span>' +
+        '<div class="row"><span class="profit">+' + finalProfit + ' ₽</span>' +
           '<button class="btn-cook" onclick="startMinigame(\'' + r.id + '\')" ' + (state.energy < r.energy ? 'disabled' : '') + '>Готовить</button>' +
         '</div>' +
       '</div>' +
@@ -1601,12 +1623,14 @@ function renderRecipes() {
   for (var i = 0; i < RECIPES.length; i++) {
     var r = RECIPES[i];
     var owned = state.owned[r.id];
+    var levelBonus = 1 + (state.level - 1) * 0.1;
+    var finalProfit = Math.round(r.profit * levelBonus);
     html += '<div class="recipe-card ' + (owned ? '' : 'locked') + '">' +
       '<div class="recipe-photo" style="background:' + photoGrads[r.g] + ';">' + r.e + '</div>' +
       '<div class="recipe-body">' +
         '<div class="n">' + r.n + '</div>' +
         '<div class="meta">' + r.desc + '</div>' +
-        '<div class="meta">Прибыль: +' + r.profit + ' ₽ · Энергия: ' + r.energy + '</div>' +
+        '<div class="meta">Прибыль: +' + finalProfit + ' ₽ · Энергия: ' + r.energy + '</div>' +
         '<div class="row">' +
           (owned
             ? '<span class="profit" style="color:#1e8a3c;">✓ Куплен</span>'
@@ -1789,7 +1813,7 @@ function renderLeaders() {
   if (inp && !inp.value) inp.value = state.playerName;
   if (!list) return;
   
-  if (LEADERBOARD_URL === 'ВСТАВЬ_СЮДА_ССЫЛКУ_ИЗ_ШАГА_3') {
+  if (LEADERBOARD_URL === 'https://script.google.com/macros/s/AKfycbyz-5qqmlxXugUtw4SwEezWhDQSRA0ZI_nBI9NX7NnAIRt59ONW9YhvdwITT1Q2Mw5J1Q/exec') {
     var arr = getLeaders();
     if (arr.length === 0) { list.innerHTML = '<p style="color:#8a97a5;">Пока никого нет. Поиграй — и попади в таблицу!</p>'; return; }
     var html = '';
@@ -1863,13 +1887,13 @@ function startMinigame(recipeId) {
 }
 function finishMinigame(r, success, quality) {
   if (success) {
-    var bonus = Math.round(r.profit * quality);
+    var levelBonus = 1 + (state.level - 1) * 0.1;
+    var bonus = Math.round(r.profit * quality * levelBonus);
     state.energy -= r.energy;
     state.cash += bonus;
     state.cookCount = (state.cookCount || 0) + 1;
     if (state.cash > state.bestCash) state.bestCash = state.cash;
     
-    // Ежедневное задание
     state.dailyQuests.cook = (state.dailyQuests.cook || 0) + 1;
     
     addXP(10);
@@ -2580,9 +2604,13 @@ function startDoom() {
   doomState.ammo = 50;
   doomState.kills = 0;
   doomState.player = { x: 1.5, y: 1.5, dir: 0 };
+  
+  // Больше врагов и они в разных комнатах
   doomState.enemies = [
     { x: 5, y: 5, hp: 50, speed: 0.01, dmg: 0.1 },
-    { x: 7, y: 3, hp: 50, speed: 0.01, dmg: 0.1 }
+    { x: 7, y: 3, hp: 70, speed: 0.01, dmg: 0.15 },
+    { x: 2, y: 7, hp: 60, speed: 0.01, dmg: 0.12 },
+    { x: 8, y: 8, hp: 100, speed: 0.01, dmg: 0.2 }
   ];
   
   document.getElementById('doomHp').textContent = '100';
@@ -2609,6 +2637,7 @@ function doomLoop(now) {
   if (doomState.keys['a']) { p.dir -= rotSpeed; }
   if (doomState.keys['d']) { p.dir += rotSpeed; }
   
+  // Коллизии со стенами (игрок)
   var newX = p.x;
   var newY = p.y;
   if (doomState.map[Math.floor(newY)] && doomState.map[Math.floor(newY)][Math.floor(newX)] === 1) {
@@ -2619,14 +2648,24 @@ function doomLoop(now) {
     p.y = newY;
   }
   
+  // Враги двигаются к игроку, но тоже не проходят сквозь стены
   for (var i = 0; i < doomState.enemies.length; i++) {
     var e = doomState.enemies[i];
     var dx = p.x - e.x;
     var dy = p.y - e.y;
     var dist = Math.sqrt(dx*dx + dy*dy);
     if (dist > 1.5) {
-      e.x += (dx / dist) * e.speed * dt * 60;
-      e.y += (dy / dist) * e.speed * dt * 60;
+      var moveX = (dx / dist) * e.speed * dt * 60;
+      var moveY = (dy / dist) * e.speed * dt * 60;
+      
+      var ex = e.x + moveX;
+      var ey = e.y + moveY;
+      
+      // Проверка, что враг не входит в стену
+      if (doomState.map[Math.floor(ey)] && doomState.map[Math.floor(ey)][Math.floor(ex)] !== 1) {
+        e.x = ex;
+        e.y = ey;
+      }
     } else {
       doomState.hp -= e.dmg * dt * 60;
       document.getElementById('doomHp').textContent = Math.max(0, Math.floor(doomState.hp));
@@ -2675,6 +2714,7 @@ function doomDraw() {
     }
   }
   
+  // Отрисовка врагов (только если они не за стеной)
   for (var i = 0; i < doomState.enemies.length; i++) {
     var e = doomState.enemies[i];
     var dx = e.x - p.x;
@@ -2684,7 +2724,20 @@ function doomDraw() {
     while (angle < -Math.PI) angle += Math.PI*2;
     while (angle > Math.PI) angle -= Math.PI*2;
     
-    if (Math.abs(angle) < Math.PI/4 && dist > 0.5) {
+    // Проверка видимости (raycast от игрока до врага)
+    var visible = true;
+    var checkDist = 0.1;
+    while (checkDist < dist) {
+      checkDist += 0.1;
+      var checkX = p.x + (dx / dist) * checkDist;
+      var checkY = p.y + (dy / dist) * checkDist;
+      if (doomState.map[Math.floor(checkY)] && doomState.map[Math.floor(checkY)][Math.floor(checkX)] === 1) {
+        visible = false; // Враг за стеной
+        break;
+      }
+    }
+    
+    if (visible && Math.abs(angle) < Math.PI/4 && dist > 0.5) {
       var screenX = w/2 + (angle / (Math.PI/4)) * (w/2);
       var size = h / (dist * 1.2);
       ctx.fillStyle = '#8b0000';
